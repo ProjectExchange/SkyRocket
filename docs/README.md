@@ -1,3 +1,3 @@
 # SkyRocket Documentation
 
-<img src="./assets/ArchitecturalDesign.svg">
+<img src="./assets/ArchitecturalDesign.drawio.svg">
