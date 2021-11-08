@@ -19,5 +19,5 @@ fn rocket() -> _ {
     use dotenv::dotenv;
     dotenv().ok();
 
-    rocket::build().attach(db::stage()).attach(routes::stage())
+    routes::init().attach(db::stage())
 }

@@ -20,3 +20,7 @@ features = ["json"]
 [dependencies.rocket_sync_db_pools]
 version = "0.1.0-rc.1"
 features = ["diesel_mysql_pool"]
+
+[dependencies.rocket_okapi]
+version = "0.8.0-rc.1"
+features = ["swagger", "rapidoc"]
