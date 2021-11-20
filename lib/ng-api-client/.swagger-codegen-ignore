@@ -24,3 +24,4 @@
 README.md
 git_push.sh
 package*.json
+.npmrc
