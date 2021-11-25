@@ -1,5 +1,4 @@
 use super::schema::users;
-
 use rocket::serde::{Deserialize, Serialize};
 use rocket_okapi::okapi::schemars;
 use rocket_okapi::okapi::schemars::JsonSchema;
@@ -14,4 +13,13 @@ pub struct User {
     pub lastname: String,
     pub email: String,
     pub password: String,
+}
+
+/// This schema provides redirect url's for all configured OAuth providers. If a provider is not
+/// configured, a null value is returned
+#[derive(Deserialize, Serialize, JsonSchema)]
+#[serde(crate = "rocket::serde")]
+pub struct OAuthProviders {
+    /// Redirect url for GitHub OAuth
+    pub github: Option<String>,
 }
