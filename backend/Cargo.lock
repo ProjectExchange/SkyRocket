@@ -76,6 +76,7 @@ dependencies = [
  "diesel",
  "diesel_migrations",
  "dotenv",
+ "once_cell",
  "rocket",
  "rocket_okapi",
  "rocket_sync_db_pools",

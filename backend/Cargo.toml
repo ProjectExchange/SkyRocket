@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 diesel_migrations = "1.4.0"
 dotenv = "0.15.0"
+once_cell = "1.4.0"
 
 [dependencies.diesel]
 version = "1.4.8"
