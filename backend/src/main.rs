@@ -8,6 +8,7 @@ extern crate diesel;
 extern crate diesel_migrations;
 
 pub mod db;
+pub mod http;
 pub mod models;
 pub mod schema;
 

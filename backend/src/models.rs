@@ -23,3 +23,19 @@ pub struct OAuthProviders {
     /// Redirect url for GitHub OAuth
     pub github: Option<String>,
 }
+
+#[derive(Deserialize, Serialize, JsonSchema)]
+#[serde(crate = "rocket::serde")]
+pub struct GitHubAccessTokenRequest<'a> {
+    pub client_id: &'a str,
+    pub client_secret: &'a str,
+    pub code: String,
+}
+
+#[derive(Deserialize, Serialize, JsonSchema)]
+#[serde(crate = "rocket::serde")]
+pub struct GitHubAccessTokenResponse {
+    pub access_token: String,
+    pub scope: String,
+    pub token_type: String,
+}
