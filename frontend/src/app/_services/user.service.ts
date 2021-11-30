@@ -2,13 +2,12 @@ import { Injectable } from '@angular/core';
 import { User } from '@skyrocket/ng-api-client';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class UserService {
-
   #user?: User;
 
-  constructor() { }
+  constructor() { /**/ }
 
   set user(user: User) {
     this.#user = user;

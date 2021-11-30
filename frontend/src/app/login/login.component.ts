@@ -4,14 +4,13 @@ import { LoginService, OAuthProviders } from '@skyrocket/ng-api-client';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.sass']
+  styleUrls: ['./login.component.sass'],
 })
 export class LoginComponent implements OnInit {
-
   public oAuthEndpoints: OAuthProviders = {};
 
   constructor(
-    private loginService: LoginService
+    private loginService: LoginService,
   ) {}
 
   ngOnInit(): void {
@@ -19,8 +18,8 @@ export class LoginComponent implements OnInit {
   }
 
   fetchOAuthEndpoints(): void {
-    this.loginService.oauthList().subscribe((data) => {
+    this.loginService.oauthList().subscribe((data: OAuthProviders) => {
       this.oAuthEndpoints = data;
-    })
+    });
   }
 }

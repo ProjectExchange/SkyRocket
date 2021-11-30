@@ -6,10 +6,9 @@ import { UserService } from '../_services/user.service';
 @Component({
   selector: 'app-oauth',
   templateUrl: './oauth.component.html',
-  styleUrls: ['./oauth.component.sass']
+  styleUrls: ['./oauth.component.sass'],
 })
 export class OauthComponent implements OnInit {
-
   constructor(
     private activatedRoute: ActivatedRoute,
     private loginService: LoginService,
@@ -23,8 +22,8 @@ export class OauthComponent implements OnInit {
     switch (service?.toLowerCase()) {
       case 'github':
         this.activatedRoute.queryParams.subscribe((params) => {
-          const code = params['code'];
-          this.loginService.loginGithub(code).subscribe((user) => {
+          const { code } = params;
+          this.loginService.loginGithub(code).subscribe((user: UserService) => {
             this.userService.user = user;
             // valid user if id is already set
             if (this.userService.isLoggedIn) {
@@ -32,7 +31,7 @@ export class OauthComponent implements OnInit {
             } else {
               this.router.navigate(['/register']);
             }
-          })
+          });
         });
         break;
       default:
