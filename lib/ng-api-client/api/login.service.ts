@@ -18,6 +18,7 @@ import { CustomHttpUrlEncodingCodec }                        from '../encoder';
 import { Observable }                                        from 'rxjs';
 
 import { OAuthProviders } from '../model/oAuthProviders';
+import { User } from '../model/user';
 
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
@@ -57,18 +58,18 @@ export class LoginService {
 
     /**
      * 
-     * Callback for GitHub OAuth
+     * Login endpoint for GitHub OAuth  The returned user variable has an id of null, iff the GitHub user hasn&#x27;t registered yet. If has user has registered previously, a valid id is returned. In every other case (e.g. internal server error), nothing is returned.  # Arguments  * &#x60;code&#x60; - The OAuth code recevied by GitHub.
      * @param code 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public githubCallback(code: string, observe?: 'body', reportProgress?: boolean): Observable<string>;
-    public githubCallback(code: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<string>>;
-    public githubCallback(code: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<string>>;
-    public githubCallback(code: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public loginGithub(code: string, observe?: 'body', reportProgress?: boolean): Observable<User>;
+    public loginGithub(code: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<User>>;
+    public loginGithub(code: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<User>>;
+    public loginGithub(code: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
         if (code === null || code === undefined) {
-            throw new Error('Required parameter code was null or undefined when calling githubCallback.');
+            throw new Error('Required parameter code was null or undefined when calling loginGithub.');
         }
 
         let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
@@ -80,7 +81,7 @@ export class LoginService {
 
         // to determine the Accept header
         let httpHeaderAccepts: string[] = [
-            'text/plain'
+            'application/json'
         ];
         const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
         if (httpHeaderAcceptSelected != undefined) {
@@ -91,7 +92,7 @@ export class LoginService {
         const consumes: string[] = [
         ];
 
-        return this.httpClient.request<string>('get',`${this.basePath}/users/login/oauth/callback/github`,
+        return this.httpClient.request<User>('post',`${this.basePath}/users/login/oauth/github`,
             {
                 params: queryParameters,
                 withCredentials: this.configuration.withCredentials,

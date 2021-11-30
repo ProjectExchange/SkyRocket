@@ -45,9 +45,13 @@ async fn oauth_list() -> Json<OAuthProviders> {
 /// The returned user variable has an id of null, iff the GitHub user hasn't
 /// registered yet. If has user has registered previously, a valid id is returned.
 /// In every other case (e.g. internal server error), nothing is returned.
+///
+/// # Arguments
+///
+/// * `code` - The OAuth code recevied by GitHub.
 #[openapi(tag = "Login")]
 #[post("/oauth/github?<code>")]
-async fn github_callback(db: Db, code: String) -> Option<Json<User>> {
+async fn login_github(db: Db, code: String) -> Option<Json<User>> {
     // validate token received from github
     let oauth_res = http::post::<GitHubAccessTokenResponse, GitHubAccessTokenRequest>(
         "https://github.com/login/oauth/access_token",
@@ -98,5 +102,5 @@ async fn github_callback(db: Db, code: String) -> Option<Json<User>> {
 }
 
 pub fn get_routes_and_docs(settings: &OpenApiSettings) -> (Vec<rocket::Route>, OpenApi) {
-    openapi_get_routes_spec![settings: oauth_list, github_callback]
+    openapi_get_routes_spec![settings: oauth_list, login_github]
 }
