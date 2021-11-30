@@ -1,4 +1,7 @@
 import { Component } from '@angular/core';
+import { Title } from '@angular/platform-browser';
+import { LoginService } from '@skyrocket/ng-api-client';
+import { UserService } from './_services/user.service';
 
 @Component({
   selector: 'app-root',
@@ -6,5 +9,12 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.sass']
 })
 export class AppComponent {
-  title = 'frontend';
+  title = 'SkyRocket';
+
+  constructor(
+    private titleService: Title,
+    public userService: UserService,
+  ) {
+    this.titleService.setTitle('SkyRocket');
+  }
 }

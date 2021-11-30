@@ -1,0 +1,85 @@
+<div class="header">
+  <div class="header-search">
+    <h3><i>Rusten Sie nicht aus wegen teuerer Flüge ...</i></h3>
+    <h1 class="mb-2">
+      Buchen Sie günstige Flüge mit <strong>SkyRocket</strong>
+    </h1>
+    <form class="header-search-form">
+      <mat-form-field class="header-search-input" appearance="fill">
+        <mat-label>Departure</mat-label>
+        <input matInput placeholder="Ex. San Francisco" />
+        <mat-icon matSuffix>flight_takeoff</mat-icon>
+      </mat-form-field>
+      <mat-form-field class="header-search-input" appearance="fill">
+        <mat-label>Arrival</mat-label>
+        <input matInput placeholder="Ex. California" />
+        <mat-icon matSuffix>flight_land</mat-icon>
+      </mat-form-field>
+      <mat-form-field class="header-search-input" appearance="fill">
+        <mat-label>Enter a date range</mat-label>
+        <mat-date-range-input [rangePicker]="picker">
+          <input matStartDate placeholder="Start date" />
+          <input matEndDate placeholder="End date" />
+        </mat-date-range-input>
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-date-range-picker #picker></mat-date-range-picker>
+      </mat-form-field>
+
+      <div class="text-align-center mt-2">
+        <button mat-raised-button color="primary" class="search-button">
+          Search
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="container">
+  <h1>Actual News</h1>
+  <div class="content">
+    <div fxLayout="row wrap" fxLayoutAlign="center center" fxLayoutGap="10px">
+      <div *ngFor="let num of [1,2,3,4]">
+        <mat-card class="mat-elevation-z4" >
+          <mat-card-header>
+            <mat-card-title>New York {{num}}</mat-card-title>
+          </mat-card-header>
+          <img mat-card-image src="/assets/img/nyc-4854718_1920.jpg">
+          <mat-card-content>
+            <p>
+              The Himalayas is a mountain range in Asia.
+            </p>
+          </mat-card-content>
+          <mat-card-actions>
+            <button mat-button>LIKE</button>
+            <button mat-button>SHARE</button>
+          </mat-card-actions>
+        </mat-card>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <h1>Best Flights</h1>
+  <div class="content">
+    <div fxLayout="row wrap" fxLayoutAlign="center center" fxLayoutGap="10px">
+      <div *ngFor="let num of [1,2,3,4]">
+        <mat-card class="mat-elevation-z4" >
+          <mat-card-header>
+            <mat-card-title>Flight {{num}}</mat-card-title>
+          </mat-card-header>
+          <img mat-card-image src="/assets/img/airplane-4974678_1920.jpg">
+          <mat-card-content>
+            <p>
+              The Himalayas is a mountain range in Asia.
+            </p>
+          </mat-card-content>
+          <mat-card-actions>
+            <button mat-button>BOOKING</button>
+            <button mat-button>SHARE</button>
+          </mat-card-actions>
+        </mat-card>
+      </div>
+    </div>
+  </div>
+</div>

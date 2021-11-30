@@ -1,0 +1,11 @@
+<div class="main-wrapper" fxLayout="row" fxLayoutAlign="center center">
+  <mat-card class="box">
+    <mat-card-header>
+      <mat-card-title>Login</mat-card-title>
+    </mat-card-header>
+
+    <div class="login-content">
+      <a href="{{oAuthEndpoints.github}}" mat-flat-button color="primary" class="btn-block" *ngIf="oAuthEndpoints.github">Login using GitHub</a>
+    </div>
+  </mat-card>
+</div>
