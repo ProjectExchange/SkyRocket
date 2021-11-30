@@ -14,6 +14,12 @@ pub struct User {
     pub email: String,
 }
 
+#[derive(Deserialize, Serialize, JsonSchema)]
+#[serde(crate = "rocket::serde")]
+pub struct ErrorBody {
+    pub error: String,
+}
+
 #[derive(Debug, Clone, Deserialize, Serialize, Queryable, Insertable, JsonSchema)]
 #[serde(crate = "rocket::serde")]
 #[table_name = "users_oauth_github"]
