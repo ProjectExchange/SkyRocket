@@ -7,6 +7,7 @@ pub static CONFIG: Lazy<Config> = Lazy::new(Config::load);
 pub struct Config {
     pub oauth_github_client_id: Option<String>,
     pub oauth_github_client_secret: Option<String>,
+    pub redis_url: Option<String>,
 }
 
 fn read_opt_from_env(key: &str) -> Option<String> {
@@ -21,6 +22,7 @@ impl Config {
         Self {
             oauth_github_client_id: read_opt_from_env("OAUTH_GITHUB_CLIENT_ID"),
             oauth_github_client_secret: read_opt_from_env("OAUTH_GITHUB_CLIENT_SECRET"),
+            redis_url: read_opt_from_env("REDIS_URL"),
         }
 
     }

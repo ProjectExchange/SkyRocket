@@ -1,8 +1,10 @@
+use rocket::http::CookieJar;
 use crate::db::Db;
 use crate::models::OAuthProviders;
 use crate::models::User;
 use crate::models::{GitHubAccessTokenRequest, GitHubAccessTokenResponse, GitHubOAuthUser};
 use crate::{http, CONFIG};
+use crate::session::create_session;
 use diesel::prelude::*;
 use rocket::http::uri::fmt::Query;
 use rocket::http::uri::fmt::UriDisplay;
@@ -51,7 +53,7 @@ async fn oauth_list() -> Json<OAuthProviders> {
 /// * `code` - The OAuth code recevied by GitHub.
 #[openapi(tag = "Login")]
 #[post("/oauth/github?<code>")]
-async fn login_github(db: Db, code: String) -> Option<Json<User>> {
+async fn login_github(db: Db, code: String, cookies: &CookieJar<'_>) -> Option<Json<User>> {
     // validate token received from github
     let oauth_res = http::post::<GitHubAccessTokenResponse, GitHubAccessTokenRequest>(
         "https://github.com/login/oauth/access_token",
@@ -87,9 +89,9 @@ async fn login_github(db: Db, code: String) -> Option<Json<User>> {
         let user = db
             .run(move |conn| users.filter(id.eq(github_user.unwrap().user_id)).first::<User>(conn))
             .await
-            .map(Json)
-            .ok();
-        return user;
+            .ok()?;
+        create_session(cookies, user.clone()).await;
+        Some(Json(user))
     } else {
         let mut iter = user_res.get("name")?.as_str()?.splitn(2, ' ');
         Some(Json(User {

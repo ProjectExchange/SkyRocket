@@ -11,6 +11,7 @@ pub mod db;
 pub mod http;
 pub mod models;
 pub mod schema;
+pub mod session;
 
 mod config;
 mod routes;
@@ -22,6 +23,8 @@ pub use config::CONFIG;
 fn rocket() -> _ {
     // load config and .env file, which is also required by the db module
     config::init();
+    // init session storage with redis connection
+    session::init();
     // initialize and start rocket server
     routes::init().attach(db::stage())
 }
