@@ -124,7 +124,7 @@ async fn login_github(db: Db, code: String, cookies: &CookieJar<'_>) -> ApiResul
                 .get("email")
                 .ok_or(error(Status::InternalServerError, ""))?
                 .as_str()
-                .ok_or(error(Status::InternalServerError, ""))?
+                .unwrap_or("")
                 .into(),
         }))
     }
