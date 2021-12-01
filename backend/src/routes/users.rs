@@ -34,6 +34,8 @@ async fn create(db: Db, cookies: &CookieJar<'_>, user: Json<User>) -> ApiResult<
     .await
     .ok_or(error(Status::InternalServerError, ""))?;
 
+    session::revoke(cookies).await;
+    session::set_user(cookies, user.clone()).await;
     Ok(user)
 }
 
@@ -61,6 +63,15 @@ async fn delete(db: Db, id: i32) -> ApiResult<()> {
         .ok_or(error(Status::NotFound, ""))
 }
 
+#[openapi(tag = "Users")]
+#[get("/profile")]
+async fn profile(cookies: &CookieJar<'_>) -> ApiResult<Json<User>> {
+    session::get_user_from_session(cookies).await.map_or(
+        Err(error(Status::Forbidden, "You are not logged in")),
+        |u| Ok(Json(u)),
+    )
+}
+
 #[openapi(tag = "Login")]
 #[post("/logout")]
 async fn logout(cookies: &CookieJar<'_>) -> ApiResult<()> {
@@ -70,5 +81,5 @@ async fn logout(cookies: &CookieJar<'_>) -> ApiResult<()> {
 }
 
 pub fn get_routes_and_docs(settings: &OpenApiSettings) -> (Vec<rocket::Route>, OpenApi) {
-    openapi_get_routes_spec![settings: list, read, create, delete, logout]
+    openapi_get_routes_spec![settings: list, read, create, delete, profile, logout]
 }
