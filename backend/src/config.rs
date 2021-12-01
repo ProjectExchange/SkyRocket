@@ -24,7 +24,6 @@ impl Config {
             oauth_github_client_secret: read_opt_from_env("OAUTH_GITHUB_CLIENT_SECRET"),
             redis_url: read_opt_from_env("REDIS_URL"),
         }
-
     }
 }
 
