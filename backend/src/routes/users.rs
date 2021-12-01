@@ -61,6 +61,14 @@ async fn delete(db: Db, id: i32) -> ApiResult<()> {
         .ok_or(error(Status::NotFound, ""))
 }
 
+#[openapi(tag = "Login")]
+#[post("/logout")]
+async fn logout(cookies: &CookieJar<'_>) -> ApiResult<()> {
+    session::revoke(cookies)
+        .await
+        .ok_or(error(Status::Unauthorized, "No session to revoke"))
+}
+
 pub fn get_routes_and_docs(settings: &OpenApiSettings) -> (Vec<rocket::Route>, OpenApi) {
-    openapi_get_routes_spec![settings: list, read, create, delete]
+    openapi_get_routes_spec![settings: list, read, create, delete, logout]
 }

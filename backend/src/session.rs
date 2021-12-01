@@ -102,6 +102,19 @@ pub async fn get_github_id(cookies: &CookieJar<'_>) -> Option<i32> {
         .get(SESSION_GITHUB_ID_NAME)
 }
 
+/// Destroy the current user session. Session is removed in redis and the users browser
+/// cookie is deleted. Returns `Some(())` if successful, `None` otherwise.
+///
+/// # Arguments
+///
+/// * `cookies` - The cookie jar of the users browser
+pub async fn revoke(cookies: &CookieJar<'_>) -> Option<()> {
+    let session = get_redis_session(cookies).await?;
+    REDIS.destroy_session(session).await.ok()?;
+    cookies.remove_private(Cookie::named(COOKIE_NAME));
+    Some(())
+}
+
 pub fn init() {
     Lazy::force(&REDIS);
 }
