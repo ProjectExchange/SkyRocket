@@ -3,7 +3,7 @@ use crate::db::Db;
 use crate::models::OAuthProviders;
 use crate::models::User;
 use crate::models::{GitHubAccessTokenRequest, GitHubAccessTokenResponse, GitHubOAuthUser};
-use crate::session::create_session;
+use crate::session;
 use crate::{http, CONFIG};
 use rocket::http::uri::fmt::Query;
 use rocket::http::uri::fmt::UriDisplay;
@@ -90,9 +90,10 @@ async fn login_github(db: Db, code: String, cookies: &CookieJar<'_>) -> ApiResul
         let user = User::find_by_id(&db, github_user.unwrap().user_id)
             .await
             .ok_or(error(Status::InternalServerError, ""))?;
-        create_session(cookies, user.clone()).await;
+        session::set_user(cookies, user.clone()).await;
         Ok(user)
     } else {
+        session::set_github_id(cookies, github_id).await;
         let mut iter = user_res
             .get("name")
             .ok_or(error(Status::InternalServerError, ""))?

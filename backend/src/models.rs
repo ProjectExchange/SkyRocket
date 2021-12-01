@@ -33,7 +33,7 @@ impl User {
         })
         .await
         .ok()
-        .map_or_else(||Some(()), |_e|None)
+        .map_or_else(|| Some(()), |_e| None)
     }
 
     pub async fn find_by_id(db: &Db, id: i32) -> Option<Json<Self>> {
@@ -82,6 +82,16 @@ impl GitHubOAuthUser {
             .await
             .map(Json)
             .ok()
+    }
+
+    pub async fn save(db: &Db, user: GitHubOAuthUser) -> Option<usize> {
+        db.run(move |conn| {
+            diesel::insert_into(users_oauth_github::table)
+                .values(user)
+                .execute(conn)
+        })
+        .await
+        .ok()
     }
 }
 

@@ -1,7 +1,9 @@
 use crate::db::Db;
+use crate::models::GitHubOAuthUser;
 use crate::models::User;
 use crate::routes::{error, ApiResult};
-use rocket::http::Status;
+use crate::session;
+use rocket::http::{CookieJar, Status};
 use rocket::serde::json::Json;
 use rocket_okapi::{
     okapi::openapi3::OpenApi, openapi, openapi_get_routes_spec, settings::OpenApiSettings,
@@ -9,10 +11,30 @@ use rocket_okapi::{
 
 #[openapi(tag = "Users")]
 #[post("/", data = "<user>")]
-async fn create(db: Db, user: Json<User>) -> ApiResult<Json<User>> {
-    User::save_and_return(&db, user.into_inner())
+async fn create(db: Db, cookies: &CookieJar<'_>, user: Json<User>) -> ApiResult<Json<User>> {
+    // retrieve github id from users browser cookie
+    let github_id = session::get_github_id(cookies).await.ok_or(error(
+        Status::Unauthorized,
+        "You are not using a supported OAuth provider",
+    ))?;
+
+    // save user value to db
+    let user = User::save_and_return(&db, user.into_inner())
         .await
-        .ok_or(error(Status::InternalServerError, ""))
+        .ok_or(error(Status::InternalServerError, ""))?;
+
+    // link user to GitHub OAuth account
+    GitHubOAuthUser::save(
+        &db,
+        GitHubOAuthUser {
+            user_id: user.id.ok_or(error(Status::InternalServerError, ""))?,
+            github_id,
+        },
+    )
+    .await
+    .ok_or(error(Status::InternalServerError, ""))?;
+
+    Ok(user)
 }
 
 #[openapi(tag = "Users")]
