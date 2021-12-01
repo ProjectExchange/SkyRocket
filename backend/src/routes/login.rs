@@ -74,7 +74,7 @@ async fn login_github(db: Db, code: String, cookies: &CookieJar<'_>) -> ApiResul
     .await
     .map_err(|_e| error(Status::Unauthorized, "Failed to validate OAuth code"))?;
 
-    // fetch github user data
+    // fetch GitHub user data
     let user_res = http::get::<Value>("https://api.github.com/user", &oauth_res.access_token)
         .await
         .map_err(|_e| error(Status::Unauthorized, "Failed to validate OAuth code"))?;
