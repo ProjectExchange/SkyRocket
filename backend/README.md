@@ -1,6 +1,6 @@
 # SkyRocket backend
 
-To run the project you need a `.env` file with the following content in the `src` folder
+To run the project you need a `.env` file with the following content in the `backend` folder
 
 ```toml
 REDIS_URL=redis://127.0.0.1/
