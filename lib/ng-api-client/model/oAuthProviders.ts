@@ -10,9 +10,12 @@
  * Do not edit the class manually.
  */
 
-export interface User { 
-    readonly id?: number;
-    firstname: string;
-    lastname: string;
-    email: string;
+/**
+ * This schema provides redirect url's for all configured OAuth providers. If a provider is not configured, a null value is returned
+ */
+export interface OAuthProviders { 
+    /**
+     * Redirect url for GitHub OAuth
+     */
+    github?: string;
 }
