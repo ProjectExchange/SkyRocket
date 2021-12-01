@@ -56,7 +56,7 @@ async fn oauth_list() -> Json<OAuthProviders> {
 #[openapi(tag = "Login")]
 #[post("/oauth/github?<code>")]
 async fn login_github(db: Db, code: String, cookies: &CookieJar<'_>) -> ApiResult<Json<User>> {
-    // validate token received from github
+    // validate token received from GitHub
     let oauth_res = http::post::<GitHubAccessTokenResponse, GitHubAccessTokenRequest>(
         "https://github.com/login/oauth/access_token",
         &GitHubAccessTokenRequest {
