@@ -11,5 +11,5 @@ CREATE TABLE `users_oauth_github` (
     `user_id` INT(255) NOT NULL UNIQUE,
     `github_id` INT(255) NOT NULL UNIQUE,
     PRIMARY KEY (`github_id`),
-    FOREIGN KEY (`user_id`) REFERENCES users (`id`)
+    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
 );
