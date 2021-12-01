@@ -9,7 +9,6 @@ edition = "2021"
 diesel_migrations = "1.4.0"
 dotenv = "0.15.0"
 once_cell = "1.4.0"
-reqwest = { version = "0.11", features = ["json"] }
 async-session = "3.0.0"
 async-redis-session = "0.2.2"
 
