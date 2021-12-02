@@ -12,7 +12,7 @@ use rocket_okapi::{
 #[openapi(tag = "Users")]
 #[post("/", data = "<user>")]
 async fn create(db: Db, cookies: &CookieJar<'_>, user: Json<User>) -> ApiResult<Json<User>> {
-    // retrieve github id from users browser cookie
+    // retrieve GitHub id from users browser cookie
     let github_id = session::get_github_id(cookies).await.ok_or(error(
         Status::Unauthorized,
         "You are not using a supported OAuth provider",
