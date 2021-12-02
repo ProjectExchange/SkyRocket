@@ -48,7 +48,7 @@ async fn list(db: Db) -> ApiResult<Json<Vec<User>>> {
 
 #[openapi(tag = "Users")]
 #[get("/<id>")]
-async fn read(db: Db, id: i32) -> ApiResult<Json<User>> {
+async fn read(_user: User, db: Db, id: i32) -> ApiResult<Json<User>> {
     User::find_by_id(&db, id)
         .await
         .ok_or(error(Status::NotFound, ""))
