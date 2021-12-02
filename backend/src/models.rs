@@ -10,7 +10,6 @@ use rocket_okapi::okapi::schemars::JsonSchema;
 #[serde(crate = "rocket::serde")]
 #[table_name = "users"]
 pub struct User {
-    #[serde(skip_deserializing)]
     pub id: Option<i32>,
     pub firstname: String,
     pub lastname: String,
