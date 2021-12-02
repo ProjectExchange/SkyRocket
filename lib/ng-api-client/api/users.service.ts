@@ -17,6 +17,7 @@ import { CustomHttpUrlEncodingCodec }                        from '../encoder';
 
 import { Observable }                                        from 'rxjs';
 
+import { ErrorBody } from '../model/errorBody';
 import { User } from '../model/user';
 
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
@@ -75,6 +76,7 @@ export class UsersService {
 
         // to determine the Accept header
         let httpHeaderAccepts: string[] = [
+            'application/json'
         ];
         const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
         if (httpHeaderAcceptSelected != undefined) {
@@ -148,41 +150,6 @@ export class UsersService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public destroy(observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public destroy(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public destroy(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public destroy(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
-
-        let headers = this.defaultHeaders;
-
-        // to determine the Accept header
-        let httpHeaderAccepts: string[] = [
-        ];
-        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        if (httpHeaderAcceptSelected != undefined) {
-            headers = headers.set('Accept', httpHeaderAcceptSelected);
-        }
-
-        // to determine the Content-Type header
-        const consumes: string[] = [
-        ];
-
-        return this.httpClient.request<any>('delete',`${this.basePath}/users/`,
-            {
-                withCredentials: this.configuration.withCredentials,
-                headers: headers,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
-    }
-
-    /**
-     * 
-     * 
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
-     */
     public list(observe?: 'body', reportProgress?: boolean): Observable<Array<User>>;
     public list(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<User>>>;
     public list(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<User>>>;
@@ -204,6 +171,42 @@ export class UsersService {
         ];
 
         return this.httpClient.request<Array<User>>('get',`${this.basePath}/users/`,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * 
+     * 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public profile(observe?: 'body', reportProgress?: boolean): Observable<User>;
+    public profile(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<User>>;
+    public profile(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<User>>;
+    public profile(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.request<User>('get',`${this.basePath}/users/profile`,
             {
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,

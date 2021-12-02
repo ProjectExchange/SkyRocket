@@ -3,13 +3,11 @@ use crate::db::Db;
 use crate::models::OAuthProviders;
 use crate::models::User;
 use crate::models::{GitHubAccessTokenRequest, GitHubAccessTokenResponse, GitHubOAuthUser};
-use crate::session::create_session;
+use crate::session;
 use crate::{http, CONFIG};
-use diesel::prelude::*;
 use rocket::http::uri::fmt::Query;
 use rocket::http::uri::fmt::UriDisplay;
-use rocket::http::CookieJar;
-use rocket::http::Status;
+use rocket::http::{CookieJar, Status};
 use rocket::serde::json::Json;
 use rocket::serde::json::Value;
 use rocket_okapi::okapi::openapi3::OpenApi;
@@ -86,30 +84,16 @@ async fn login_github(db: Db, code: String, cookies: &CookieJar<'_>) -> ApiResul
         .ok_or(error(Status::InternalServerError, ""))? as i32;
 
     // find user in db
-    use crate::schema::users_oauth_github::dsl::users_oauth_github;
-    let github_user = db
-        .run(move |conn| {
-            users_oauth_github
-                .find(github_id)
-                .first::<GitHubOAuthUser>(conn)
-        })
-        .await
-        .map_err(|_e| error(Status::InternalServerError, ""))
-        .ok();
+    let github_user = GitHubOAuthUser::find_by_id(&db, github_id).await;
 
     if github_user.is_some() {
-        use crate::schema::users::dsl::{id, users};
-        let user = db
-            .run(move |conn| {
-                users
-                    .filter(id.eq(github_user.unwrap().user_id))
-                    .first::<User>(conn)
-            })
+        let user = User::find_by_id(&db, github_user.unwrap().user_id)
             .await
-            .map_err(|_e| error(Status::InternalServerError, ""))?;
-        create_session(cookies, user.clone()).await;
-        Ok(Json(user))
+            .ok_or(error(Status::InternalServerError, ""))?;
+        session::set_user(cookies, user.clone()).await;
+        Ok(user)
     } else {
+        session::set_github_id(cookies, github_id).await;
         let mut iter = user_res
             .get("name")
             .ok_or(error(Status::InternalServerError, ""))?

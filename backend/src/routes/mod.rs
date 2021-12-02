@@ -1,7 +1,6 @@
 use crate::models::ErrorBody;
 use rocket::http::Status;
 use rocket::response::status;
-use rocket::response::Debug;
 use rocket::serde::json::Json;
 use rocket::{Build, Rocket};
 use rocket_okapi::mount_endpoints_and_merged_docs;
@@ -9,8 +8,6 @@ use rocket_okapi::mount_endpoints_and_merged_docs;
 mod docs;
 mod login;
 mod users;
-
-pub type Result<T, E = Debug<diesel::result::Error>> = std::result::Result<T, E>;
 
 pub type ApiError = status::Custom<Json<ErrorBody>>;
 
