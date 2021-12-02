@@ -1,21 +1,22 @@
 use crate::db::{schema::users, Db};
 use crate::session;
 use diesel::prelude::*;
+use oso::{Oso, PolarClass};
 use rocket::http::Status;
 use rocket::request::{FromRequest, Outcome};
 use rocket::serde::json::Json;
 use rocket::serde::{Deserialize, Serialize};
 use rocket::Request;
 use rocket_okapi::gen::OpenApiGenerator;
-use rocket_okapi::request::{OpenApiFromRequest, RequestHeaderInput};
-
 use rocket_okapi::okapi::schemars;
 use rocket_okapi::okapi::schemars::JsonSchema;
+use rocket_okapi::request::{OpenApiFromRequest, RequestHeaderInput};
 
-#[derive(Debug, Clone, Deserialize, Serialize, Queryable, Insertable, JsonSchema)]
+#[derive(Debug, Clone, PolarClass, Deserialize, Serialize, Queryable, Insertable, JsonSchema)]
 #[serde(crate = "rocket::serde")]
 #[table_name = "users"]
 pub struct User {
+    #[polar(attribute)]
     pub id: Option<i32>,
     pub firstname: String,
     pub lastname: String,
@@ -23,6 +24,10 @@ pub struct User {
 }
 
 impl User {
+    pub fn register_polar_class(oso: &mut Oso) -> oso::Result<()> {
+        oso.register_class(User::get_polar_class())
+    }
+
     pub async fn get_all(db: &Db) -> Option<Json<Vec<User>>> {
         db.run(move |conn| users::table.load::<User>(conn))
             .await
