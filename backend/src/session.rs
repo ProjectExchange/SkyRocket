@@ -1,4 +1,4 @@
-use crate::models::User;
+use crate::db::models::User;
 use crate::CONFIG;
 use async_redis_session::RedisSessionStore;
 use async_session::{Session, SessionStore};

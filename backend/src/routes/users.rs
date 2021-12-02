@@ -1,6 +1,5 @@
+use crate::db::models::{GitHubOAuthUser, User};
 use crate::db::Db;
-use crate::models::GitHubOAuthUser;
-use crate::models::User;
 use crate::routes::{error, ApiResult};
 use crate::session;
 use rocket::http::{CookieJar, Status};

@@ -1,8 +1,7 @@
 use super::{error, ApiResult};
+use super::{GitHubAccessTokenRequest, GitHubAccessTokenResponse, OAuthProviders};
+use crate::db::models::{GitHubOAuthUser, User};
 use crate::db::Db;
-use crate::models::OAuthProviders;
-use crate::models::User;
-use crate::models::{GitHubAccessTokenRequest, GitHubAccessTokenResponse, GitHubOAuthUser};
 use crate::session;
 use crate::{http, CONFIG};
 use rocket::http::uri::fmt::Query;

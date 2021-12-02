@@ -1,3 +1,6 @@
+pub mod models;
+pub(self) mod schema;
+
 use rocket::fairing::AdHoc;
 use rocket::{Build, Rocket};
 
