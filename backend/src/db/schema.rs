@@ -15,9 +15,11 @@ table! {
 }
 
 table! {
-    users_roles (user_id, role_id) {
+    use diesel::sql_types::Integer;
+    use crate::db::models::RoleMapping;
+    users_roles (user_id, role) {
         user_id -> Integer,
-        role_id -> Integer,
+        role -> RoleMapping, // Generated Diesel type
     }
 }
 

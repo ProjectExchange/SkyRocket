@@ -1,3 +1,4 @@
+use crate::db::models::role::Role;
 use crate::db::models::UserRole;
 use crate::db::{schema::users, Db};
 use crate::session;
@@ -42,10 +43,6 @@ pub struct User {
 }
 
 impl User {
-    pub fn register_polar_class(oso: &mut Oso) -> oso::Result<()> {
-        oso.register_class(User::get_polar_class())
-    }
-
     pub async fn get_all(db: &Db) -> Option<Json<Vec<User>>> {
         db.run(move |conn| users::table.load::<User>(conn))
             .await
@@ -84,14 +81,16 @@ impl User {
     }
 }
 
-#[derive(Debug, Clone, Deserialize, Serialize, JsonSchema)]
+#[derive(Debug, Clone, Deserialize, Serialize, JsonSchema, PolarClass)]
 #[serde(crate = "rocket::serde")]
 pub struct AuthUser {
+    #[polar(attribute)]
     pub id: i32,
     pub firstname: String,
     pub lastname: String,
     pub email: String,
-    pub roles: Vec<i32>,
+    #[polar(attribute)]
+    pub roles: Vec<Role>,
 }
 
 impl AuthUser {
@@ -102,7 +101,7 @@ impl AuthUser {
         Some(AuthUser::new(user, roles))
     }
 
-    pub fn new(user: Json<User>, roles: Vec<i32>) -> Self {
+    pub fn new(user: Json<User>, roles: Vec<Role>) -> Self {
         AuthUser {
             id: user.id,
             firstname: user.firstname.clone(),
@@ -134,4 +133,9 @@ impl<'r> OpenApiFromRequest<'r> for AuthUser {
     ) -> rocket_okapi::Result<RequestHeaderInput> {
         Ok(RequestHeaderInput::None)
     }
+}
+
+pub(super) fn register_polar_classes(oso: &mut Oso) -> oso::Result<()> {
+    oso.register_class(User::get_polar_class())?;
+    oso.register_class(AuthUser::get_polar_class())
 }

@@ -1,5 +1,6 @@
 use crate::db::models::{AuthUser, GitHubOAuthUser, GithubOAuthRegistrar, NewUser, User};
 use crate::db::Db;
+use crate::oso::{OsoAction, OsoState};
 use crate::routes::{error, ApiResult};
 use crate::session;
 use rocket::http::{CookieJar, Status};
@@ -11,7 +12,7 @@ use rocket_okapi::{
 #[openapi(tag = "Users")]
 #[post("/", data = "<new_user>")]
 async fn create(
-    registrar: GithubOAuthRegistrar,
+    actor: GithubOAuthRegistrar,
     db: Db,
     cookies: &CookieJar<'_>,
     new_user: Json<NewUser>,
@@ -26,7 +27,7 @@ async fn create(
         &db,
         GitHubOAuthUser {
             user_id: user.id,
-            github_id: registrar.github_id,
+            github_id: actor.github_id,
         },
     )
     .await
@@ -49,10 +50,15 @@ async fn list(db: Db) -> ApiResult<Json<Vec<User>>> {
 
 #[openapi(tag = "Users")]
 #[get("/<id>")]
-async fn read(_user: AuthUser, db: Db, id: i32) -> ApiResult<Json<User>> {
-    User::find_by_id(&db, id)
+async fn read(actor: AuthUser, oso: &OsoState, db: Db, id: i32) -> ApiResult<Json<User>> {
+    let resource = User::find_by_id(&db, id)
         .await
-        .ok_or(error(Status::NotFound, ""))
+        .ok_or(error(Status::NotFound, ""))?;
+    if oso.is_allowed(actor, OsoAction::Read, resource.clone()) {
+        Ok(resource)
+    } else {
+        Err(error(Status::Forbidden, "Forbidden"))
+    }
 }
 
 #[openapi(tag = "Users")]
