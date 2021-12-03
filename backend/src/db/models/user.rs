@@ -1,3 +1,4 @@
+use crate::db::models::UserRole;
 use crate::db::{schema::users, Db};
 use crate::session;
 use diesel::prelude::*;
@@ -12,12 +13,29 @@ use rocket_okapi::okapi::schemars;
 use rocket_okapi::okapi::schemars::JsonSchema;
 use rocket_okapi::request::{OpenApiFromRequest, RequestHeaderInput};
 
-#[derive(Debug, Clone, PolarClass, Deserialize, Serialize, Queryable, Insertable, JsonSchema)]
+#[derive(Debug, Clone, Deserialize, Serialize, Insertable, JsonSchema)]
+#[serde(crate = "rocket::serde")]
+#[table_name = "users"]
+pub struct NewUser {
+    pub firstname: String,
+    pub lastname: String,
+    pub email: String,
+}
+
+impl NewUser {
+    pub async fn save(db: &Db, user: NewUser) -> Option<usize> {
+        db.run(move |conn| diesel::insert_into(users::table).values(user).execute(conn))
+            .await
+            .ok()
+    }
+}
+
+#[derive(Debug, Clone, PolarClass, Deserialize, Serialize, Identifiable, Queryable, JsonSchema)]
 #[serde(crate = "rocket::serde")]
 #[table_name = "users"]
 pub struct User {
     #[polar(attribute)]
-    pub id: Option<i32>,
+    pub id: i32,
     pub firstname: String,
     pub lastname: String,
     pub email: String,
@@ -60,20 +78,43 @@ impl User {
             .ok()
     }
 
-    pub async fn save(db: &Db, user: User) -> Option<usize> {
-        db.run(move |conn| diesel::insert_into(users::table).values(user).execute(conn))
-            .await
-            .ok()
-    }
-
-    pub async fn save_and_return(db: &Db, user: User) -> Option<Json<Self>> {
-        User::save(db, user.clone()).await?;
+    pub async fn save_and_return(db: &Db, user: NewUser) -> Option<Json<Self>> {
+        NewUser::save(db, user.clone()).await?;
         User::find_by_email(db, user.email).await
     }
 }
 
+#[derive(Debug, Clone, Deserialize, Serialize, JsonSchema)]
+#[serde(crate = "rocket::serde")]
+pub struct AuthUser {
+    pub id: i32,
+    pub firstname: String,
+    pub lastname: String,
+    pub email: String,
+    pub roles: Vec<i32>,
+}
+
+impl AuthUser {
+    pub async fn by_user_id(db: &Db, id: i32) -> Option<Self> {
+        let user = User::find_by_id(db, id).await?;
+        let roles = UserRole::all_from_user(db, user.clone()).await;
+
+        Some(AuthUser::new(user, roles))
+    }
+
+    pub fn new(user: Json<User>, roles: Vec<i32>) -> Self {
+        AuthUser {
+            id: user.id,
+            firstname: user.firstname.clone(),
+            lastname: user.lastname.clone(),
+            email: user.email.clone(),
+            roles,
+        }
+    }
+}
+
 #[rocket::async_trait]
-impl<'a> FromRequest<'a> for User {
+impl<'a> FromRequest<'a> for AuthUser {
     type Error = String;
 
     async fn from_request(request: &'a Request<'_>) -> Outcome<Self, Self::Error> {
@@ -85,7 +126,7 @@ impl<'a> FromRequest<'a> for User {
     }
 }
 
-impl<'r> OpenApiFromRequest<'r> for User {
+impl<'r> OpenApiFromRequest<'r> for AuthUser {
     fn from_request_input(
         _gen: &mut OpenApiGenerator,
         _name: String,

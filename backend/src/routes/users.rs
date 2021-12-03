@@ -1,4 +1,4 @@
-use crate::db::models::{GitHubOAuthUser, User};
+use crate::db::models::{AuthUser, GitHubOAuthUser, GithubOAuthRegistrar, NewUser, User};
 use crate::db::Db;
 use crate::routes::{error, ApiResult};
 use crate::session;
@@ -9,16 +9,15 @@ use rocket_okapi::{
 };
 
 #[openapi(tag = "Users")]
-#[post("/", data = "<user>")]
-async fn create(db: Db, cookies: &CookieJar<'_>, user: Json<User>) -> ApiResult<Json<User>> {
-    // retrieve GitHub id from users browser cookie
-    let github_id = session::get_github_id(cookies).await.ok_or(error(
-        Status::Unauthorized,
-        "You are not using a supported OAuth provider",
-    ))?;
-
+#[post("/", data = "<new_user>")]
+async fn create(
+    registrar: GithubOAuthRegistrar,
+    db: Db,
+    cookies: &CookieJar<'_>,
+    new_user: Json<NewUser>,
+) -> ApiResult<Json<AuthUser>> {
     // save user value to db
-    let user = User::save_and_return(&db, user.into_inner())
+    let user = User::save_and_return(&db, new_user.into_inner())
         .await
         .ok_or(error(Status::InternalServerError, ""))?;
 
@@ -26,16 +25,18 @@ async fn create(db: Db, cookies: &CookieJar<'_>, user: Json<User>) -> ApiResult<
     GitHubOAuthUser::save(
         &db,
         GitHubOAuthUser {
-            user_id: user.id.ok_or(error(Status::InternalServerError, ""))?,
-            github_id,
+            user_id: user.id,
+            github_id: registrar.github_id,
         },
     )
     .await
     .ok_or(error(Status::InternalServerError, ""))?;
 
+    let auth_user = AuthUser::new(user, Vec::new());
+
     session::revoke(cookies).await;
-    session::set_user(cookies, user.clone()).await;
-    Ok(user)
+    session::set_user(cookies, auth_user.clone()).await;
+    Ok(Json(auth_user))
 }
 
 #[openapi(tag = "Users")]
@@ -48,7 +49,7 @@ async fn list(db: Db) -> ApiResult<Json<Vec<User>>> {
 
 #[openapi(tag = "Users")]
 #[get("/<id>")]
-async fn read(_user: User, db: Db, id: i32) -> ApiResult<Json<User>> {
+async fn read(_user: AuthUser, db: Db, id: i32) -> ApiResult<Json<User>> {
     User::find_by_id(&db, id)
         .await
         .ok_or(error(Status::NotFound, ""))
@@ -64,7 +65,7 @@ async fn delete(db: Db, id: i32) -> ApiResult<()> {
 
 #[openapi(tag = "Users")]
 #[get("/profile")]
-async fn profile(cookies: &CookieJar<'_>) -> ApiResult<Json<User>> {
+async fn profile(cookies: &CookieJar<'_>) -> ApiResult<Json<AuthUser>> {
     session::get_user_from_session(cookies).await.map_or(
         Err(error(Status::Forbidden, "You are not logged in")),
         |u| Ok(Json(u)),
