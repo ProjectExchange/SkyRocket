@@ -1,0 +1,97 @@
+<div class="content">
+  <div class="content-book">
+    <h3><i>Rusten Sie nicht aus wegen teuerer Flüge ...</i></h3>
+    <h1 class="mb-2">
+      Buchen Sie günstige Flüge mit <strong>SkyRocket</strong>
+    </h1>
+    <div class="content-use-width"></div>
+    <div class="content-book-form">
+      <mat-stepper orientation="vertical" linear="true" #stepper>
+        <!-- flight data check -->
+        <mat-step>
+          <ng-template matStepLabel>Check your flight data</ng-template>
+          <mat-list>
+            <mat-list-item>Departure&emsp;<strong>{{ departure }}</strong></mat-list-item>
+            <mat-divider></mat-divider>
+            <mat-list-item>Arrival&emsp;<strong>{{ arrival }}</strong></mat-list-item>
+            <mat-divider></mat-divider>
+            <mat-list-item>Date from/to&emsp;<strong>{{ dateDeparture }} - {{ dateArrival }}</strong></mat-list-item>
+          </mat-list>        
+          <div>
+            <button mat-stroked-button matStepperNext>Next</button>
+          </div>
+        </mat-step>
+
+        <!-- flight selection -->
+        <mat-step [stepControl]="bookFormStep1">
+          <form [formGroup]="bookFormStep1">
+            <ng-template matStepLabel>Select your flight</ng-template>
+            <div class="form-field-group">
+              <mat-form-field appearance="fill">
+                <mat-label>Flight</mat-label>
+                <mat-select name="flight" formControlName="flight">
+                  <mat-option *ngFor="let flight of flights" [value]="flight.value">
+                    {{flight.viewValue}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div>
+              <button mat-button matStepperPrevious>Back</button>
+              <button mat-button matStepperNext>Next</button>
+            </div>
+          </form>
+        </mat-step>
+
+        <!-- firstname and lastname -->
+        <mat-step [stepControl]="bookFormStep2">
+          <form [formGroup]="bookFormStep2">
+            <ng-template matStepLabel>Check your name</ng-template>
+            <mat-form-field class="content-book-input" appearance="fill">
+              <mat-label>Firstname</mat-label>
+              <input matInput formControlName="firstname" placeholder="Firstname" required>
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+              <mat-label>Lastname</mat-label>
+              <input matInput formControlName="lastname" placeholder="Lastname" required>
+            </mat-form-field>
+            <div>
+              <button mat-button matStepperPrevious>Back</button>
+              <button mat-button matStepperNext>Next</button>
+            </div>
+          </form>
+        </mat-step>
+
+        <!-- address selection -->
+        <mat-step [stepControl]="bookFormStep3">
+          <form [formGroup]="bookFormStep3">
+            <ng-template matStepLabel>Select your address</ng-template>
+            <div class="form-field-group">
+              <mat-form-field appearance="fill">
+                <mat-label>Address</mat-label>
+                <mat-select name="address" formControlName="address">
+                  <mat-option *ngFor="let address of addresses" [value]="address.value">
+                    {{address.viewValue}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div>
+              <button mat-button matStepperPrevious>Back</button>
+              <button mat-button matStepperNext>Next</button>
+            </div>
+          </form>
+        </mat-step>
+
+        <mat-step>
+          <ng-template matStepLabel>Done</ng-template>
+          <p>You are now done.</p>
+          <div>
+            <button mat-button matStepperPrevious>Back</button>
+            <button mat-button (click)="stepper.reset()">Reset</button>
+          </div>
+        </mat-step>
+      </mat-stepper>      
+    </div>
+  </div>
+</div>
