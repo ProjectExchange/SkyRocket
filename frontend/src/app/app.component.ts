@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { UserService } from './_services/user.service';
+import { AuthService } from './_services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -12,7 +12,7 @@ export class AppComponent {
 
   constructor(
     private titleService: Title,
-    public userService: UserService,
+    public authService: AuthService,
   ) {
     this.titleService.setTitle('SkyRocket');
   }

@@ -4,12 +4,12 @@ import { User } from '@skyrocket/ng-api-client';
 @Injectable({
   providedIn: 'root',
 })
-export class UserService {
+export class AuthService {
   #user?: User;
 
   constructor() { /**/ }
 
-  set user(user: User) {
+  set user(user: User | undefined) {
     this.#user = user;
   }
 
@@ -19,6 +19,10 @@ export class UserService {
 
   get lastname(): string {
     return this.#user?.lastname || '';
+  }
+
+  get email(): string {
+    return this.#user?.email || '';
   }
 
   get isLoggedIn(): boolean {

@@ -4,29 +4,29 @@
     <h1 class="mb-2">
       Buchen Sie günstige Flüge mit <strong>SkyRocket</strong>
     </h1>
-    <form class="header-search-form">
+    <form class="header-search-form" [formGroup]="bookForm" (ngSubmit)="onSubmit()">
       <mat-form-field class="header-search-input" appearance="fill">
         <mat-label>Departure</mat-label>
-        <input matInput placeholder="Ex. San Francisco" />
+        <input matInput formControlName="departure" placeholder="San Francisco" />
         <mat-icon matSuffix>flight_takeoff</mat-icon>
       </mat-form-field>
       <mat-form-field class="header-search-input" appearance="fill">
         <mat-label>Arrival</mat-label>
-        <input matInput placeholder="Ex. California" />
+        <input matInput formControlName="arrival" placeholder="California" />
         <mat-icon matSuffix>flight_land</mat-icon>
       </mat-form-field>
       <mat-form-field class="header-search-input" appearance="fill">
         <mat-label>Enter a date range</mat-label>
-        <mat-date-range-input [rangePicker]="picker">
-          <input matStartDate placeholder="Start date" />
-          <input matEndDate placeholder="End date" />
+        <mat-date-range-input [rangePicker]="picker" formGroupName="date">
+          <input matStartDate formControlName="dateDeparture" placeholder="Departure" />
+          <input matEndDate formControlName="dateArrival" placeholder="Arrival" />
         </mat-date-range-input>
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-date-range-picker #picker></mat-date-range-picker>
       </mat-form-field>
 
       <div class="text-align-center mt-2">
-        <button mat-raised-button color="primary" class="search-button">
+        <button mat-raised-button color="primary" class="header-search-button">
           Search
         </button>
       </div>

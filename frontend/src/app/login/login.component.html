@@ -4,8 +4,15 @@
       <mat-card-title>Login</mat-card-title>
     </mat-card-header>
 
-    <div class="login-content">
-      <a href="{{oAuthEndpoints.github}}" mat-flat-button color="primary" class="btn-block" *ngIf="oAuthEndpoints.github">Login using GitHub</a>
-    </div>
+    <mat-card-content class="login-description">
+      <p>Login using one of the following services.</p>
+    </mat-card-content>
+    <mat-card-actions>
+      <div>
+        <a href="{{oAuthEndpoints.github}}" mat-flat-button color="primary" class="login-btn" *ngIf="oAuthEndpoints.github">Login using GitHub</a>
+        <a href="#" mat-flat-button color="warn" class="login-btn">Login using Google</a>
+        <a href="#" mat-flat-button color="warn" class="login-btn">Login using Apple</a>
+      </div>
+    </mat-card-actions>
   </mat-card>
 </div>
