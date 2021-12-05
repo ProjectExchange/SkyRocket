@@ -9,8 +9,7 @@ extern crate diesel_migrations;
 
 pub mod db;
 pub mod http;
-pub mod models;
-pub mod schema;
+pub mod oso;
 pub mod session;
 
 mod config;
@@ -26,5 +25,5 @@ fn rocket() -> _ {
     // init session storage with redis connection
     session::init();
     // initialize and start rocket server
-    routes::init().attach(db::stage())
+    routes::init().manage(oso::init()).attach(db::stage())
 }

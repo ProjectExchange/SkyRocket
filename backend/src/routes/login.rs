@@ -1,17 +1,19 @@
 use super::{error, ApiResult};
+use super::{GitHubAccessTokenRequest, GitHubAccessTokenResponse, OAuthProviders};
+use crate::db::models::{AuthUser, GitHubOAuthUser, NewUser};
 use crate::db::Db;
-use crate::models::OAuthProviders;
-use crate::models::User;
-use crate::models::{GitHubAccessTokenRequest, GitHubAccessTokenResponse, GitHubOAuthUser};
 use crate::session;
 use crate::{http, CONFIG};
 use rocket::http::uri::fmt::Query;
 use rocket::http::uri::fmt::UriDisplay;
 use rocket::http::{CookieJar, Status};
-use rocket::serde::json::Json;
-use rocket::serde::json::Value;
-use rocket_okapi::okapi::openapi3::OpenApi;
-use rocket_okapi::{openapi, openapi_get_routes_spec, settings::OpenApiSettings};
+use rocket::response::Responder;
+use rocket::serde::json::{Json, Value};
+use rocket_okapi::gen::OpenApiGenerator;
+use rocket_okapi::okapi::openapi3::{OpenApi, Responses};
+use rocket_okapi::response::OpenApiResponderInner;
+use rocket_okapi::util::add_schema_response;
+use rocket_okapi::{openapi, openapi_get_routes_spec, settings::OpenApiSettings, Result};
 
 #[derive(UriDisplayQuery)]
 struct GitHubOAuth<'a> {
@@ -42,6 +44,34 @@ async fn oauth_list() -> Json<OAuthProviders> {
     Json(OAuthProviders { github: github_url })
 }
 
+/// Either returns an already registrated user, or some userdata that can be used to prefill forms
+/// in case the user isn't registered yet.
+#[derive(Responder)]
+enum RegistratedOrNewUser {
+    Registrated(Json<AuthUser>),
+    New(Json<NewUser>),
+}
+
+#[rocket::async_trait]
+impl OpenApiResponderInner for RegistratedOrNewUser {
+    fn responses(gen: &mut OpenApiGenerator) -> Result<Responses> {
+        let mut response = Responses::default();
+        add_schema_response(
+            &mut response,
+            200,
+            "application/json",
+            gen.json_schema::<AuthUser>(),
+        )?;
+        add_schema_response(
+            &mut response,
+            200,
+            "application/json",
+            gen.json_schema::<NewUser>(),
+        )?;
+        Ok(response)
+    }
+}
+
 /// Login endpoint for GitHub OAuth
 ///
 /// The returned user variable has an id of null, iff the GitHub user hasn't
@@ -53,7 +83,11 @@ async fn oauth_list() -> Json<OAuthProviders> {
 /// * `code` - The OAuth code recevied by GitHub.
 #[openapi(tag = "Login")]
 #[post("/oauth/github?<code>")]
-async fn login_github(db: Db, code: String, cookies: &CookieJar<'_>) -> ApiResult<Json<User>> {
+async fn login_github(
+    db: Db,
+    code: String,
+    cookies: &CookieJar<'_>,
+) -> ApiResult<RegistratedOrNewUser> {
     // validate token received from GitHub
     let oauth_res = http::post::<GitHubAccessTokenResponse, GitHubAccessTokenRequest>(
         "https://github.com/login/oauth/access_token",
@@ -83,15 +117,12 @@ async fn login_github(db: Db, code: String, cookies: &CookieJar<'_>) -> ApiResul
         .as_i64()
         .ok_or(error(Status::InternalServerError, ""))? as i32;
 
-    // find user in db
-    let github_user = GitHubOAuthUser::find_by_id(&db, github_id).await;
-
-    if github_user.is_some() {
-        let user = User::find_by_id(&db, github_user.unwrap().user_id)
+    if let Some(github_user) = GitHubOAuthUser::find_by_id(&db, github_id).await {
+        let user = AuthUser::by_user_id(&db, github_user.user_id)
             .await
             .ok_or(error(Status::InternalServerError, ""))?;
         session::set_user(cookies, user.clone()).await;
-        Ok(user)
+        Ok(RegistratedOrNewUser::Registrated(Json(user)))
     } else {
         session::set_github_id(cookies, github_id).await;
         let mut iter = user_res
@@ -100,8 +131,7 @@ async fn login_github(db: Db, code: String, cookies: &CookieJar<'_>) -> ApiResul
             .as_str()
             .ok_or(error(Status::InternalServerError, ""))?
             .splitn(2, ' ');
-        Ok(Json(User {
-            id: None,
+        Ok(RegistratedOrNewUser::New(Json(NewUser {
             firstname: iter.next().unwrap().into(),
             lastname: iter.next().unwrap_or("").into(),
             email: user_res
@@ -110,7 +140,7 @@ async fn login_github(db: Db, code: String, cookies: &CookieJar<'_>) -> ApiResul
                 .as_str()
                 .unwrap_or("")
                 .into(),
-        }))
+        })))
     }
 }
 

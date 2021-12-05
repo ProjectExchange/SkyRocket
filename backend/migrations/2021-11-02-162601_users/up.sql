@@ -13,3 +13,10 @@ CREATE TABLE `users_oauth_github` (
     PRIMARY KEY (`github_id`),
     FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
 );
+
+CREATE TABLE `users_roles` (
+    `user_id` INT(255) NOT NULL,
+    `role` enum('admin') NOT NULL, -- enum values must be written in snake_case
+    PRIMARY KEY (`user_id`, `role`),
+    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+);

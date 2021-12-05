@@ -1,4 +1,4 @@
-use crate::models::User;
+use crate::db::models::AuthUser;
 use crate::CONFIG;
 use async_redis_session::RedisSessionStore;
 use async_session::{Session, SessionStore};
@@ -66,7 +66,7 @@ async fn get_redis_session(cookies: &CookieJar<'_>) -> Option<Session> {
 ///
 /// * `cookies` - The cookie jar of the users browser, which holds the redis key
 /// * `user` - The user to save the cookie for. User data is stored within redis
-pub async fn set_user(cookies: &CookieJar<'_>, user: User) {
+pub async fn set_user(cookies: &CookieJar<'_>, user: AuthUser) {
     let cookie_option = add_redis_session(SESSION_USER_NAME, user).await;
     add_browser_cookie(cookies, COOKIE_NAME, cookie_option.unwrap());
 }
@@ -87,7 +87,7 @@ pub async fn set_github_id(cookies: &CookieJar<'_>, id: i32) {
 /// # Arguments
 ///
 /// * `cookies` - The cookie jar of the users browser
-pub async fn get_user_from_session(cookies: &CookieJar<'_>) -> Option<User> {
+pub async fn get_user_from_session(cookies: &CookieJar<'_>) -> Option<AuthUser> {
     get_redis_session(cookies).await?.get(SESSION_USER_NAME)
 }
 

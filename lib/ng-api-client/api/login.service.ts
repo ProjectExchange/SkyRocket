@@ -18,8 +18,8 @@ import { CustomHttpUrlEncodingCodec }                        from '../encoder';
 import { Observable }                                        from 'rxjs';
 
 import { ErrorBody } from '../model/errorBody';
+import { InlineResponse200 } from '../model/inlineResponse200';
 import { OAuthProviders } from '../model/oAuthProviders';
-import { User } from '../model/user';
 
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
@@ -64,9 +64,9 @@ export class LoginService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public loginGithub(code: string, observe?: 'body', reportProgress?: boolean): Observable<User>;
-    public loginGithub(code: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<User>>;
-    public loginGithub(code: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<User>>;
+    public loginGithub(code: string, observe?: 'body', reportProgress?: boolean): Observable<InlineResponse200>;
+    public loginGithub(code: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<InlineResponse200>>;
+    public loginGithub(code: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<InlineResponse200>>;
     public loginGithub(code: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
         if (code === null || code === undefined) {
@@ -93,7 +93,7 @@ export class LoginService {
         const consumes: string[] = [
         ];
 
-        return this.httpClient.request<User>('post',`${this.basePath}/users/login/oauth/github`,
+        return this.httpClient.request<InlineResponse200>('post',`${this.basePath}/users/login/oauth/github`,
             {
                 params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
