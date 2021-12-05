@@ -1,4 +1,4 @@
-import { Component, ElementRef, NgZone, OnInit } from '@angular/core';
+import { Component, ElementRef } from '@angular/core';
 import {
   FormBuilder, FormGroup, Validators,
 } from '@angular/forms';
@@ -11,7 +11,7 @@ import { AuthService } from '../_services/auth.service';
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.sass'],
 })
-export class RegisterComponent implements OnInit {
+export class RegisterComponent {
   registerForm: FormGroup;
 
   constructor(
@@ -36,8 +36,6 @@ export class RegisterComponent implements OnInit {
       ],
     });
   }
-
-  ngOnInit(): void {}
 
   ngAfterViewInit() {
     this.elementRef.nativeElement.ownerDocument.body.style.backgroundImage = 'url("../../assets/img/berg-5128982_1920.jpg")';

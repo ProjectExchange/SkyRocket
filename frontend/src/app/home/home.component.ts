@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BookingService } from '../_services/booking.service';
@@ -8,7 +8,7 @@ import { BookingService } from '../_services/booking.service';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.sass'],
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent {
   bookForm: FormGroup;
 
   constructor(
@@ -25,8 +25,6 @@ export class HomeComponent implements OnInit {
       }),
     });
   }
-
-  ngOnInit(): void {}
 
   form(control: string): string {
     return this.bookForm.controls[control].value;

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../_services/auth.service';
 import { BookingService } from '../_services/booking.service';
@@ -18,11 +18,11 @@ interface Address {
   templateUrl: './book.component.html',
   styleUrls: ['./book.component.sass'],
 })
-export class BookComponent implements OnInit {
-  departure: String = this.bookingService.departure;
-  arrival: String = this.bookingService.arrival;
-  dateDeparture: String = this.bookingService.dateDeparture.toString().split(' ').slice(1, 4).join(' ');
-  dateArrival: String = this.bookingService.dateArrival.toString().split(' ').slice(1, 4).join(' ');
+export class BookComponent {
+  departure: string = this.bookingService.departure;
+  arrival: string = this.bookingService.arrival;
+  dateDeparture: string = this.bookingService.dateDeparture.toString().split(' ').slice(1, 4).join(' ');
+  dateArrival: string = this.bookingService.dateArrival.toString().split(' ').slice(1, 4).join(' ');
 
   bookFormStep1: FormGroup;
   bookFormStep2: FormGroup;
@@ -63,6 +63,4 @@ export class BookComponent implements OnInit {
       address: ['', Validators.required],
     });
   }
-
-  ngOnInit(): void {}
 }

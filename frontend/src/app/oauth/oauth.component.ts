@@ -16,6 +16,15 @@ export class OauthComponent implements OnInit {
     private router: Router,
   ) { }
 
+  loginCallback(user: NewUser | AuthUser) {
+    this.authService.user = user;
+    if (this.authService.isLoggedIn) {
+      this.router.navigate(['/profile']);
+    } else {
+      this.router.navigate(['/register']);
+    }
+  }
+
   ngOnInit(): void {
     const service = this.activatedRoute.snapshot.paramMap.get('service');
 
@@ -23,15 +32,7 @@ export class OauthComponent implements OnInit {
       case 'github':
         this.activatedRoute.queryParams.subscribe((params) => {
           const { code } = params;
-          this.loginService.loginGithub(code).subscribe((user: NewUser | AuthUser) => {
-            this.authService.user = user;
-            // valid user if id is already set
-            if (this.authService.isLoggedIn) {
-              this.router.navigate(['/profile']);
-            } else {
-              this.router.navigate(['/register']);
-            }
-          });
+          this.loginService.loginGithub(code).subscribe(this.loginCallback);
         });
         break;
       default:
