@@ -35,7 +35,7 @@ async fn create(
     .await
     .ok_or(error(Status::InternalServerError, ""))?;
 
-    // add adminstrator rights if user was first user
+    // add administrator rights if user was first user
     if user.is_first(&db).await {
         user.attach_role(&db, Role::Admin)
             .await
