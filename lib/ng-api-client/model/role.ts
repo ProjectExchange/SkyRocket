@@ -10,9 +10,8 @@
  * Do not edit the class manually.
  */
 
-export interface User { 
-    id: number;
-    firstname: string;
-    lastname: string;
-    email: string;
-}
+export type Role = 'Admin';
+
+export const Role = {
+    Admin: 'Admin' as Role
+};

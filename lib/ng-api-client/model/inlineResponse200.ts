@@ -9,10 +9,7 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+import { AuthUser } from './authUser';
+import { NewUser } from './newUser';
 
-export interface User { 
-    id: number;
-    firstname: string;
-    lastname: string;
-    email: string;
-}
+export type InlineResponse200 = AuthUser | NewUser;

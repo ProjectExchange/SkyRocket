@@ -10,8 +10,7 @@
  * Do not edit the class manually.
  */
 
-export interface User { 
-    id: number;
+export interface NewUser { 
     firstname: string;
     lastname: string;
     email: string;
