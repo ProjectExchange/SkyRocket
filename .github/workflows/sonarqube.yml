@@ -35,6 +35,9 @@ jobs:
       - name: Generate clippy report
         run: cd backend/ && cargo clippy --message-format=json &> clippy.report
 
+      - name: Generate karma test report
+        run: cd frontend/ && npm ci && npm run test:report
+
       # Runs a single command using the runners shell
       - name: SonarQube scan
         uses: sonarsource/sonarqube-scan-action@master
