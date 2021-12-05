@@ -1,11 +1,15 @@
 actor AuthUser {}
 
 resource User {
-  permissions = ["read", "push"];
+  permissions = ["read", "update", "delete"];
   roles = ["self", "Admin"];
 
-  "read" if "Admin";
+  # admin user has all rights, that a user has on his own account
+  "self" if "Admin";
+
   "read" if "self";
+  "update" if "self";
+  "delete" if "self";
 }
 
 has_role(actor: AuthUser, "self", resource: User) if

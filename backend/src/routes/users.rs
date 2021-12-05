@@ -1,4 +1,5 @@
-use crate::db::models::{AuthUser, GitHubOAuthUser, GithubOAuthRegistrar, NewUser, User};
+use crate::db::models::AdminRole;
+use crate::db::models::{AuthUser, GitHubOAuthUser, GithubOAuthRegistrar, NewUser, Role, User};
 use crate::db::Db;
 use crate::oso::{OsoAction, OsoState};
 use crate::routes::{error, ApiResult};
@@ -18,7 +19,8 @@ async fn create(
     new_user: Json<NewUser>,
 ) -> ApiResult<Json<AuthUser>> {
     // save user value to db
-    let user = User::save_and_return(&db, new_user.into_inner())
+    let user = new_user
+        .save_and_return(&db)
         .await
         .ok_or(error(Status::InternalServerError, ""))?;
 
@@ -33,7 +35,17 @@ async fn create(
     .await
     .ok_or(error(Status::InternalServerError, ""))?;
 
-    let auth_user = AuthUser::new(user, Vec::new());
+    // add adminstrator rights if user was first user
+    if user.is_first(&db).await {
+        user.attach_role(&db, Role::Admin)
+            .await
+            .map_err(|_e| error(Status::InternalServerError, ""))?;
+    }
+
+    // fetch permissions of the given user
+    let auth_user = AuthUser::by_user_id(&db, user.id)
+        .await
+        .ok_or(error(Status::InternalServerError, ""))?;
 
     session::revoke(cookies).await;
     session::set_user(cookies, auth_user.clone()).await;
@@ -42,10 +54,19 @@ async fn create(
 
 #[openapi(tag = "Users")]
 #[get("/")]
-async fn list(db: Db) -> ApiResult<Json<Vec<User>>> {
+async fn list_for_admin(_r: AdminRole, db: Db) -> ApiResult<Json<Vec<User>>> {
     User::get_all(&db)
         .await
         .ok_or(error(Status::InternalServerError, ""))
+}
+
+#[openapi(tag = "Users")]
+#[get("/", rank = 2)]
+async fn list_for_user(actor: AuthUser, db: Db) -> ApiResult<Json<Vec<User>>> {
+    let user = User::find_by_id(&db, actor.id)
+        .await
+        .ok_or(error(Status::InternalServerError, ""))?;
+    Ok(Json(vec![user.into_inner()]))
 }
 
 #[openapi(tag = "Users")]
@@ -63,10 +84,14 @@ async fn read(actor: AuthUser, oso: &OsoState, db: Db, id: i32) -> ApiResult<Jso
 
 #[openapi(tag = "Users")]
 #[delete("/<id>")]
-async fn delete(db: Db, id: i32) -> ApiResult<()> {
-    User::delete(&db, id)
-        .await
-        .ok_or(error(Status::NotFound, ""))
+async fn delete(actor: AuthUser, oso: &OsoState, db: Db, id: i32) -> ApiResult<()> {
+    if oso.is_allowed(actor, OsoAction::Delete, User::dummy(id)) {
+        User::delete(&db, id)
+            .await
+            .ok_or(error(Status::NotFound, ""))
+    } else {
+        Err(error(Status::Forbidden, "Forbidden"))
+    }
 }
 
 #[openapi(tag = "Users")]
@@ -87,5 +112,13 @@ async fn logout(cookies: &CookieJar<'_>) -> ApiResult<()> {
 }
 
 pub fn get_routes_and_docs(settings: &OpenApiSettings) -> (Vec<rocket::Route>, OpenApi) {
-    openapi_get_routes_spec![settings: list, read, create, delete, profile, logout]
+    openapi_get_routes_spec![
+        settings: list_for_admin,
+        list_for_user,
+        read,
+        create,
+        delete,
+        profile,
+        logout
+    ]
 }
