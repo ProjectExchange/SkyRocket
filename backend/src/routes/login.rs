@@ -45,7 +45,7 @@ async fn oauth_list() -> Json<OAuthProviders> {
 }
 
 /// Either returns an already registrated user, or some userdata that can be used to prefill forms
-/// in case the used isn't registered yet.
+/// in case the user isn't registered yet.
 #[derive(Responder)]
 enum RegistratedOrNewUser {
     Registrated(Json<AuthUser>),
