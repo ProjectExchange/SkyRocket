@@ -36,7 +36,7 @@ jobs:
         run: cd backend/ && cargo clippy --message-format=json &> clippy.report
 
       - name: Build @skyrocket/ng-api-client
-        run: cd lib/ng-api-client && npm run build
+        run: cd lib/ng-api-client && npm ci && npm run build
 
       - name: Generate karma test report
         run: |
