@@ -38,13 +38,13 @@ SkyRocket is a secure booking service for flights, written in Rust and TypeScrip
 
 ## Folder overview
 
-| Folder     | Description                                                                                                        |
-| ---------- | ------------------------------------------------------------------------------------------------------------------ |
-| `.github`  | All files used by GitHub. For example, for the workflows to automatically run the SAST pipeline.                   |
-| `.vscode`  | The configuration file for the used IDE.                                                                           |
-| `backend`  | Contains all files for the SkyRocket backend. It is written in Rust and uses dependencies like Rocket.             |
-| `docker`   | Files for the development setup for spawning a clean MariaDB and Redis database in a Docker container.             |
-| `docs`     | This folder contains the SkyRocket documentation as well as the architectural design.                              |
-| `frontend` | Contains all files for the Skyrocket frontend. This is written in TypeScript using Angular.                        |
-| `lib`      | This folder is used for the necessary depedency packages generated for the frontend for connection to the backend. |
-| `scripts`  | Scripts for automated code generation. Running in some new spawned Docker container.                               |
+| Folder     | Description                                                                                                         |
+| ---------- | ------------------------------------------------------------------------------------------------------------------- |
+| `.github`  | All files used by GitHub. For example, for the workflows to automatically run the SAST pipeline.                    |
+| `.vscode`  | The configuration file for the used IDE.                                                                            |
+| `backend`  | Contains all files for the SkyRocket backend. It is written in Rust using the Rocket web framework.                 |
+| `docker`   | Files for the development setup for spawning a clean MariaDB and Redis database in a Docker container.              |
+| `docs`     | This folder contains the SkyRocket documentation as well as the architectural design.                               |
+| `frontend` | Contains all files for the Skyrocket frontend. This is written in TypeScript using Angular.                         |
+| `lib`      | This folder is used for the necessary dependency packages generated for the frontend for connection to the backend. |
+| `scripts`  | Scripts for automated code generation. Running the swagger codegen container.                                       |
