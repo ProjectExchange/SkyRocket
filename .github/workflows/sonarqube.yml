@@ -42,7 +42,7 @@ jobs:
         run: |
           cd frontend/
           npm ci
-          npm link ../lib/ng-api-client/
+          npm link ../lib/ng-api-client/dist/
           npm run test:report
 
       # Runs a single command using the runners shell
