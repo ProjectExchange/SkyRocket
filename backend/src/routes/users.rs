@@ -83,6 +83,24 @@ async fn read(actor: AuthUser, oso: &OsoState, db: Db, id: i32) -> ApiResult<Jso
 }
 
 #[openapi(tag = "Users")]
+#[put("/<id>", data = "<new_user>")]
+async fn update(
+    actor: AuthUser,
+    oso: &OsoState,
+    db: Db,
+    id: i32,
+    new_user: Json<NewUser>,
+) -> ApiResult<Json<User>> {
+    if oso.is_allowed(actor, OsoAction::Update, User::dummy(id)) {
+        User::update_and_return(&db, id, new_user.clone())
+            .await
+            .ok_or(error(Status::InternalServerError, ""))
+    } else {
+        Err(error(Status::Forbidden, "Forbidden"))
+    }
+}
+
+#[openapi(tag = "Users")]
 #[delete("/<id>")]
 async fn delete(actor: AuthUser, oso: &OsoState, db: Db, id: i32) -> ApiResult<()> {
     if oso.is_allowed(actor, OsoAction::Delete, User::dummy(id)) {
@@ -117,6 +135,7 @@ pub fn get_routes_and_docs(settings: &OpenApiSettings) -> (Vec<rocket::Route>, O
         list_for_user,
         read,
         create,
+        update,
         delete,
         profile,
         logout

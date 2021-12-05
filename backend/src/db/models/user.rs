@@ -1,3 +1,4 @@
+use super::DbResult;
 use crate::db::models::role::Role;
 use crate::db::models::UserRole;
 use crate::db::{schema::users, Db};
@@ -14,7 +15,7 @@ use rocket_okapi::okapi::schemars;
 use rocket_okapi::okapi::schemars::JsonSchema;
 use rocket_okapi::request::{OpenApiFromRequest, RequestHeaderInput};
 
-#[derive(Debug, Clone, Deserialize, Serialize, Insertable, JsonSchema)]
+#[derive(Debug, Clone, Deserialize, Serialize, Insertable, JsonSchema, AsChangeset)]
 #[serde(crate = "rocket::serde")]
 #[table_name = "users"]
 pub struct NewUser {
@@ -25,13 +26,9 @@ pub struct NewUser {
 
 impl NewUser {
     pub async fn save(db: &Db, user: NewUser) -> Option<usize> {
-        db.run(move |conn| {
-            diesel::insert_into(users::table)
-                .values(user)
-                .execute(conn)
-        })
-        .await
-        .ok()
+        db.run(move |conn| diesel::insert_into(users::table).values(user).execute(conn))
+            .await
+            .ok()
     }
 
     pub async fn save_and_return(&self, db: &Db) -> Option<Json<User>> {
@@ -71,7 +68,7 @@ impl User {
         Ok(1) == res_count
     }
 
-    pub async fn attach_role(&self, db: &Db, role: Role) -> super::DbResult {
+    pub async fn attach_role(&self, db: &Db, role: Role) -> DbResult {
         UserRole::add(db, self.clone(), role).await
     }
 
@@ -80,6 +77,17 @@ impl User {
             .await
             .map(Json)
             .ok()
+    }
+
+    pub async fn update_and_return(db: &Db, id: i32, new_user: NewUser) -> Option<Json<User>> {
+        db.run(move |conn| {
+            diesel::update(users::table.filter(users::id.eq(id)))
+                .set(new_user)
+                .execute(conn)
+        })
+        .await.ok()?;
+
+        User::find_by_id(db, id).await
     }
 
     pub async fn delete(db: &Db, id: i32) -> Option<()> {
