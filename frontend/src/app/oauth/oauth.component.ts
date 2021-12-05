@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { LoginService, User } from '@skyrocket/ng-api-client';
+import { AuthUser, LoginService, NewUser } from '@skyrocket/ng-api-client';
 import { AuthService } from '../_services/auth.service';
 
 @Component({
@@ -23,7 +23,7 @@ export class OauthComponent implements OnInit {
       case 'github':
         this.activatedRoute.queryParams.subscribe((params) => {
           const { code } = params;
-          this.loginService.loginGithub(code).subscribe((user: User) => {
+          this.loginService.loginGithub(code).subscribe((user: NewUser | AuthUser) => {
             this.authService.user = user;
             // valid user if id is already set
             if (this.authService.isLoggedIn) {

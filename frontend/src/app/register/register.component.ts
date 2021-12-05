@@ -2,7 +2,8 @@ import { Component, ElementRef, NgZone, OnInit } from '@angular/core';
 import {
   FormBuilder, FormGroup, Validators,
 } from '@angular/forms';
-import { User, UsersService } from '@skyrocket/ng-api-client';
+import { Router } from '@angular/router';
+import { AuthUser, UsersService } from '@skyrocket/ng-api-client';
 import { AuthService } from '../_services/auth.service';
 
 @Component({
@@ -17,6 +18,7 @@ export class RegisterComponent implements OnInit {
     private authService: AuthService,
     private elementRef: ElementRef,
     private formBuilder: FormBuilder,
+    private router: Router,
     private usersService: UsersService,
   ) {
     this.registerForm = this.formBuilder.group({
@@ -45,25 +47,15 @@ export class RegisterComponent implements OnInit {
     return this.registerForm.controls[control].value;
   }
 
-  register(): Promise<unknown> {
-    return new Promise(() => {
-      this.usersService.create({
-        email: this.form('email'),
-        firstname: this.form('firstname'),
-        lastname: this.form('lastname'),
-      }).subscribe((user: User) => {
-        alert(user);
-        this.authService.user = {
-          ...user, id: 1
-        };
-      });
-    });
-  }
-
   onSubmit(): void {
     if (!this.registerForm.valid) return;
-    this.register().then(() => {
-      alert(this.authService.user);
+    this.usersService.create({
+      email: this.form('email'),
+      firstname: this.form('firstname'),
+      lastname: this.form('lastname'),
+    }).subscribe((user: AuthUser) => {
+      this.authService.user = user;
+      this.router.navigate(['/profile']);
     });
   }
 }
