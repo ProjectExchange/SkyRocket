@@ -1,4 +1,4 @@
-import { Component, ElementRef } from '@angular/core';
+import { Component } from '@angular/core';
 import {
   FormBuilder, FormGroup, Validators,
 } from '@angular/forms';
@@ -16,7 +16,6 @@ export class RegisterComponent {
 
   constructor(
     private authService: AuthService,
-    private elementRef: ElementRef,
     private formBuilder: FormBuilder,
     private router: Router,
     private usersService: UsersService,
@@ -35,10 +34,6 @@ export class RegisterComponent {
         [Validators.required.bind(this), Validators.email.bind(this)],
       ],
     });
-  }
-
-  ngAfterViewInit() {
-    this.elementRef.nativeElement.ownerDocument.body.style.backgroundImage = 'url("../../assets/img/berg-5128982_1920.jpg")';
   }
 
   form(control: string): string {
