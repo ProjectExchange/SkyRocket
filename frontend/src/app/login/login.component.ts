@@ -9,9 +9,7 @@ import { LoginService, OAuthProviders } from '@skyrocket/ng-api-client';
 export class LoginComponent implements OnInit {
   public oAuthEndpoints: OAuthProviders = {};
 
-  constructor(
-    private loginService: LoginService,
-  ) {}
+  constructor(private loginService: LoginService) {}
 
   ngOnInit(): void {
     this.fetchOAuthEndpoints();

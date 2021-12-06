@@ -34,8 +34,10 @@ export class HomeComponent {
     this.bookingService.departure = this.form('departure');
     this.bookingService.arrival = this.form('arrival');
     this.bookingService.travelPeriod = {
-      dateDeparture: new Date(this.bookForm.get(['date', 'dateDeparture'])?.value),
-      dateArrival: new Date(this.bookForm.get(['date', 'dateArrival'])?.value)
+      dateDeparture: new Date(
+        this.bookForm.get(['date', 'dateDeparture'])?.value,
+      ),
+      dateArrival: new Date(this.bookForm.get(['date', 'dateArrival'])?.value),
     };
     this.router.navigate(['/book']);
   }

@@ -14,7 +14,7 @@ export class OauthComponent implements OnInit {
     private loginService: LoginService,
     private authService: AuthService,
     private router: Router,
-  ) { }
+  ) {}
 
   loginCallback(user: NewUser | AuthUser) {
     this.authService.user = user;

@@ -10,10 +10,7 @@ import { AuthService } from './_services/auth.service';
 export class AppComponent {
   title = 'SkyRocket';
 
-  constructor(
-    private titleService: Title,
-    public authService: AuthService,
-  ) {
+  constructor(private titleService: Title, public authService: AuthService) {
     this.titleService.setTitle('SkyRocket');
   }
 }

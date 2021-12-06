@@ -5,9 +5,13 @@ export function appInitializer(
   authService: AuthService,
   userService: UsersService,
 ) {
-  return (): Promise<void> => new Promise(resolve => {
-    userService.profile().subscribe((user: User) => {
-      authService.user = user;
-    }).add(resolve);
+  return (): Promise<void> => new Promise((resolve) => {
+    userService
+      .profile()
+      .subscribe((user: User) => {
+        /* eslint no-param-reassign: "error" */
+        authService.user = user;
+      })
+      .add(resolve);
   });
 }
