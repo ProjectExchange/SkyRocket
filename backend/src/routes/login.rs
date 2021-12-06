@@ -1,9 +1,10 @@
 use super::{error, ApiResult};
 use super::{GitHubAccessTokenRequest, GitHubAccessTokenResponse, OAuthProviders};
-use crate::db::models::{AuthUser, GitHubOAuthUser, NewUser};
+use crate::db::models::{AuthUser, Gender, GitHubOAuthUser, NewUser};
 use crate::db::Db;
 use crate::session;
 use crate::{http, CONFIG};
+use chrono::NaiveDate;
 use rocket::http::uri::fmt::Query;
 use rocket::http::uri::fmt::UriDisplay;
 use rocket::http::{CookieJar, Status};
@@ -134,6 +135,8 @@ async fn login_github(
         Ok(RegistratedOrNewUser::New(Json(NewUser {
             firstname: iter.next().unwrap().into(),
             lastname: iter.next().unwrap_or("").into(),
+            birthday: NaiveDate::from_yo(1970, 1),
+            gender: Gender::Male,
             email: user_res
                 .get("email")
                 .ok_or(error(Status::InternalServerError, ""))?
