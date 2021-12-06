@@ -3,7 +3,9 @@ use crate::db::models::role::Role;
 use crate::db::models::UserRole;
 use crate::db::{schema::users, Db};
 use crate::session;
+use chrono::NaiveDate;
 use diesel::prelude::*;
+use diesel_derive_enum::DbEnum;
 use oso::{Oso, PolarClass};
 use rocket::http::Status;
 use rocket::request::{FromRequest, Outcome};
@@ -15,6 +17,14 @@ use rocket_okapi::okapi::schemars;
 use rocket_okapi::okapi::schemars::JsonSchema;
 use rocket_okapi::request::{OpenApiFromRequest, RequestHeaderInput};
 
+#[derive(Debug, Clone, Deserialize, Serialize, DbEnum, JsonSchema)]
+#[serde(crate = "rocket::serde")]
+pub enum Gender {
+    Male,
+    Female,
+    Diverse,
+}
+
 #[derive(Debug, Clone, Deserialize, Serialize, Insertable, JsonSchema, AsChangeset)]
 #[serde(crate = "rocket::serde")]
 #[table_name = "users"]
@@ -22,6 +32,8 @@ pub struct NewUser {
     pub firstname: String,
     pub lastname: String,
     pub email: String,
+    pub birthday: NaiveDate,
+    pub gender: Gender,
 }
 
 impl NewUser {
@@ -46,6 +58,8 @@ pub struct User {
     pub firstname: String,
     pub lastname: String,
     pub email: String,
+    pub birthday: NaiveDate,
+    pub gender: Gender,
 }
 
 impl User {
@@ -56,6 +70,8 @@ impl User {
             firstname: String::new(),
             lastname: String::new(),
             email: String::new(),
+            birthday: NaiveDate::from_yo(1970, 1),
+            gender: Gender::Male,
         }
     }
 
@@ -85,7 +101,8 @@ impl User {
                 .set(new_user)
                 .execute(conn)
         })
-        .await.ok()?;
+        .await
+        .ok()?;
 
         User::find_by_id(db, id).await
     }
