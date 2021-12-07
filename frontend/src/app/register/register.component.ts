@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthUser, UsersService } from '@skyrocket/ng-api-client';
+import { AuthUser, Gender, UsersService } from '@skyrocket/ng-api-client';
 import { AuthService } from '../_services/auth.service';
 
 @Component({
@@ -25,11 +25,18 @@ export class RegisterComponent {
         this.authService.email,
         [Validators.required.bind(this), Validators.email.bind(this)],
       ],
+      birthday: ['', [Validators.required.bind(this)]],
+      gender: ['', [Validators.required.bind(this)]],
     });
   }
 
-  form(control: string): string {
-    return this.registerForm.controls[control].value;
+  form(name: string): string {
+    return this.registerForm.controls[name].value;
+  }
+
+  isInvalid(name: string): boolean {
+    const control = this.registerForm.controls[name];
+    return control.touched && control.invalid;
   }
 
   onSubmit(): void {
@@ -39,6 +46,11 @@ export class RegisterComponent {
         email: this.form('email'),
         firstname: this.form('firstname'),
         lastname: this.form('lastname'),
+        birthday: new Date(this.form('birthday'))
+          .toISOString()
+          .split('T')[0]
+          .toString(),
+        gender: this.form('gender') as Gender,
       })
       .subscribe((user: AuthUser) => {
         this.authService.user = user;

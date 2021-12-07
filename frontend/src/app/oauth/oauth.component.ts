@@ -32,7 +32,9 @@ export class OauthComponent implements OnInit {
       case 'github':
         this.activatedRoute.queryParams.subscribe((params) => {
           const { code } = params;
-          this.loginService.loginGithub(code).subscribe(this.loginCallback);
+          this.loginService
+            .loginGithub(code)
+            .subscribe(this.loginCallback.bind(this));
         });
         break;
       default:
