@@ -12,8 +12,8 @@ pub struct Config {
 
 fn read_opt_from_env(key: &str) -> Option<String> {
     match env::var(key) {
-        Ok(value) => return Some(value),
-        Err(_e) => return None,
+        Ok(value) => Some(value),
+        Err(_e) => None,
     }
 }
 

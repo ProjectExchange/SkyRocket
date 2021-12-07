@@ -189,7 +189,7 @@ impl AuthUser {
             firstname: user.firstname.clone(),
             lastname: user.lastname.clone(),
             email: user.email.clone(),
-            birthday: user.birthday.clone(),
+            birthday: user.birthday,
             gender: user.gender.clone(),
             roles,
         }

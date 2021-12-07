@@ -22,7 +22,7 @@ async fn create_offer(
 
     FlightOffer::last_inserted(&db)
         .await
-        .ok_or(error(Status::InternalServerError, ""))
+        .ok_or_else(|| error(Status::InternalServerError, ""))
 }
 
 #[openapi(tag = "Flights")]
@@ -50,7 +50,10 @@ async fn create_flights(
         if flight.departure_time.clone().timestamp() > prev_time {
             prev_time = flight.arrival_time.clone().timestamp();
         } else {
-            return Err(error(Status::BadRequest, "Departure of a flight must succeed arrival of previous flight"));
+            return Err(error(
+                Status::BadRequest,
+                "Departure of a flight must succeed arrival of previous flight",
+            ));
         }
         flight.is_valid()?;
     }

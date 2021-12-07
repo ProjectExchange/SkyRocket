@@ -96,7 +96,7 @@ impl Flight {
     pub async fn all_from_offer(db: &Db, offer_id: i32) -> Vec<Flight> {
         db.run(move |conn| Flight::belonging_to(&FlightOffer::dummy(offer_id)).load(conn))
             .await
-            .unwrap_or(Vec::new())
+            .unwrap_or_else(|_| Vec::new())
     }
 }
 
@@ -141,7 +141,7 @@ impl FlightOffer {
     pub async fn get_all(db: &Db) -> Vec<FlightOffer> {
         db.run(move |conn| flights_offers::table.load(conn))
             .await
-            .unwrap_or(Vec::new())
+            .unwrap_or_else(|_| Vec::new())
     }
 
     pub async fn save(db: &Db, new_offer: NewFlightOffer) -> DbResult {

@@ -86,7 +86,7 @@ impl Address {
     pub async fn all_from_user(db: &Db, user_id: i32) -> Vec<Address> {
         db.run(move |conn| Address::belonging_to(&User::dummy(user_id)).load(conn))
             .await
-            .unwrap_or(Vec::new())
+            .unwrap_or_else(|_| Vec::new())
     }
 
     pub async fn save(db: &Db, user_id: i32, new_addr: NewAddress) -> DbResult {
