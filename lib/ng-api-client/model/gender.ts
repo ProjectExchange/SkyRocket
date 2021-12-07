@@ -9,15 +9,11 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-import { Gender } from './gender';
-import { Role } from './role';
 
-export interface AuthUser { 
-    id: number;
-    firstname: string;
-    lastname: string;
-    email: string;
-    birthday: string;
-    gender: Gender;
-    roles: Array<Role>;
-}
+export type Gender = 'Male' | 'Female' | 'Diverse';
+
+export const Gender = {
+    Male: 'Male' as Gender,
+    Female: 'Female' as Gender,
+    Diverse: 'Diverse' as Gender
+};

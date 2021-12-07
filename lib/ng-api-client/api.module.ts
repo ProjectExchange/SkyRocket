@@ -3,6 +3,8 @@ import { Configuration } from './configuration';
 import { HttpClient } from '@angular/common/http';
 
 
+import { AddressesService } from './api/addresses.service';
+import { FlightsService } from './api/flights.service';
 import { LoginService } from './api/login.service';
 import { UsersService } from './api/users.service';
 
@@ -11,6 +13,8 @@ import { UsersService } from './api/users.service';
   declarations: [],
   exports:      [],
   providers: [
+    AddressesService,
+    FlightsService,
     LoginService,
     UsersService ]
 })
