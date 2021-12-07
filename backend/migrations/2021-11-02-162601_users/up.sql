@@ -23,7 +23,7 @@ CREATE TABLE `users_roles` (
     FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
 );
 
-CREATE TABLE `adresses` (
+CREATE TABLE `addresses` (
     `id` INT(255) NOT NULL,
     `user_id` INT(255) NOT NULL,
     `country` VARCHAR(255) NOT NULL,
