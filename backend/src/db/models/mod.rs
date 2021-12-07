@@ -5,7 +5,7 @@ mod role;
 mod user;
 
 pub use address::{Address, NewAddress};
-pub use flight::{Currency, CurrencyMapping};
+pub use flight::{Currency, CurrencyMapping, Flight, FlightOffer, NewFlight, NewFlightOffer};
 pub use github_oauth_user::{GitHubOAuthUser, GithubOAuthRegistrar};
 pub use role::{AdminRole, Role, RoleMapping, UserRole};
 pub use user::{AuthUser, Gender, GenderMapping, NewUser, User};
