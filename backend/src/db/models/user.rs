@@ -4,7 +4,7 @@ use crate::db::models::UserRole;
 use crate::db::{schema::users, Db};
 use crate::routes::{error, ApiResult};
 use crate::session;
-use chrono::NaiveDate;
+use chrono::{NaiveDate, Utc};
 use diesel::prelude::*;
 use diesel_derive_enum::DbEnum;
 use oso::{Oso, PolarClass};
@@ -17,7 +17,7 @@ use rocket_okapi::gen::OpenApiGenerator;
 use rocket_okapi::okapi::schemars;
 use rocket_okapi::okapi::schemars::JsonSchema;
 use rocket_okapi::request::{OpenApiFromRequest, RequestHeaderInput};
-use validator::Validate;
+use validator::{Validate, ValidationError};
 
 #[derive(Debug, Clone, Deserialize, Serialize, DbEnum, JsonSchema)]
 #[serde(crate = "rocket::serde")]
@@ -35,8 +35,21 @@ pub struct NewUser {
     pub lastname: String,
     #[validate(email)]
     pub email: String,
+    #[validate(custom = "is_adult")]
     pub birthday: NaiveDate,
     pub gender: Gender,
+}
+
+/// custom validator function to check that a given user is older than 18 years
+fn is_adult(birthday: &NaiveDate) -> Result<(), ValidationError> {
+    let age_in_days = Utc::now()
+        .naive_utc()
+        .signed_duration_since(birthday.and_hms(0, 0, 0)).num_days();
+    if  age_in_days / 365 > 18 {
+        Ok(())
+    } else {
+        Err(ValidationError::new("User must be older than 18 years"))
+    }
 }
 
 impl NewUser {

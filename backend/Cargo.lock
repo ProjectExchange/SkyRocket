@@ -321,6 +321,7 @@ dependencies = [
  "once_cell",
  "oso",
  "oso-derive",
+ "regex",
  "reqwest",
  "rocket",
  "rocket_okapi",

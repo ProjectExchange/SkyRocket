@@ -4,10 +4,13 @@ use crate::db::{schema::flights, schema::flights_offers};
 use chrono::NaiveDateTime;
 use diesel::prelude::*;
 use diesel_derive_enum::DbEnum;
+use once_cell::sync::Lazy;
+use regex::Regex;
 use rocket::serde::json::Json;
 use rocket::serde::{Deserialize, Serialize};
 use rocket_okapi::okapi::schemars;
 use rocket_okapi::okapi::schemars::JsonSchema;
+use validator::{Validate, ValidationError};
 
 #[derive(Debug, Clone, Deserialize, Serialize, DbEnum, JsonSchema)]
 #[serde(crate = "rocket::serde")]
@@ -16,13 +19,30 @@ pub enum Currency {
     Euro,
 }
 
-#[derive(Debug, Clone, Deserialize, Serialize, JsonSchema)]
+/// Regex to validate the ICAO of a given flight
+static RE_ICAO: Lazy<Regex> = Lazy::new(|| Regex::new(r"[A-Z]{4}$").unwrap());
+
+#[derive(Debug, Clone, Deserialize, Serialize, JsonSchema, Validate)]
 #[serde(crate = "rocket::serde")]
+#[validate(schema(function = "arrival_greater_departure"))]
 pub struct NewFlight {
+    #[validate(regex = "RE_ICAO")]
     departure_icao: String,
     departure_time: NaiveDateTime,
+    #[validate(regex = "RE_ICAO")]
     arrival_icao: String,
     arrival_time: NaiveDateTime,
+}
+
+/// Custom validator function to make sure arrival succeeds departure
+fn arrival_greater_departure(flight: &NewFlight) -> Result<(), ValidationError> {
+    if flight.departure_time.timestamp() < flight.arrival_time.timestamp() {
+        Ok(())
+    } else {
+        Err(ValidationError::new(
+            "Invalid flights: Arrival happens before departure",
+        ))
+    }
 }
 
 #[derive(Debug, Clone, Insertable, AsChangeset, Deserialize, Serialize)]
@@ -71,11 +91,13 @@ impl Flight {
     }
 }
 
-#[derive(Debug, Clone, Insertable, Deserialize, Serialize, JsonSchema)]
+#[derive(Debug, Clone, Insertable, Deserialize, Serialize, JsonSchema, Validate)]
 #[serde(crate = "rocket::serde")]
 #[table_name = "flights_offers"]
 pub struct NewFlightOffer {
+    #[validate(range(min = 1, max = 2000))]
     seats: i32,
+    #[validate(range(min = 1, max = 99999))]
     price: f32,
     currency: Currency,
 }
