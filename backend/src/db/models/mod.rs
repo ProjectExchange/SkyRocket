@@ -1,10 +1,14 @@
+mod address;
+mod flight;
 mod github_oauth_user;
 mod role;
 mod user;
 
+pub use address::{Address, NewAddress};
+pub use flight::{Currency, CurrencyMapping, Flight, FlightOffer, NewFlight, NewFlightOffer};
 pub use github_oauth_user::{GitHubOAuthUser, GithubOAuthRegistrar};
-pub use role::{Role, RoleMapping, UserRole, AdminRole};
-pub use user::{AuthUser, NewUser, User};
+pub use role::{AdminRole, Role, RoleMapping, UserRole};
+pub use user::{AuthUser, Gender, GenderMapping, NewUser, User};
 
 pub(self) type DbResult = Result<usize, diesel::result::Error>;
 

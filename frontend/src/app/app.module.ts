@@ -13,6 +13,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
 import { MatNativeDateModule } from '@angular/material/core';
+import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -58,6 +59,7 @@ import { LogoutComponent } from './logout/logout.component';
     MatListModule,
     MatInputModule,
     MatNativeDateModule,
+    MatRadioModule,
     MatSelectModule,
     MatStepperModule,
     MatToolbarModule,

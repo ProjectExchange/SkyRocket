@@ -9,10 +9,13 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+import { Gender } from './gender';
 
 export interface User { 
     id: number;
     firstname: string;
     lastname: string;
     email: string;
+    birthday: string;
+    gender: Gender;
 }

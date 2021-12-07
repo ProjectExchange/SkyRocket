@@ -21,14 +21,49 @@
               placeholder="Firstname"
             />
           </mat-form-field>
+          <mat-error *ngIf="isInvalid('firstname')">
+            Please provide a valid firstname
+          </mat-error>
 
           <mat-form-field class="register-input">
             <input matInput formControlName="lastname" placeholder="Lastname" />
           </mat-form-field>
+          <mat-error *ngIf="isInvalid('lastname')">
+            Please provide a valid lastname
+          </mat-error>
 
           <mat-form-field class="register-input">
             <input matInput formControlName="email" placeholder="Email" />
           </mat-form-field>
+          <mat-error *ngIf="isInvalid('email')">
+            Please provide a valid email
+          </mat-error>
+
+          <mat-form-field class="register-input">
+            <mat-label>Birthday</mat-label>
+            <input
+              matInput
+              formControlName="birthday"
+              [matDatepicker]="picker"
+            />
+            <mat-datepicker-toggle
+              matSuffix
+              [for]="picker"
+            ></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+          <mat-error *ngIf="isInvalid('birthday')">
+            Please provide a valid birthday
+          </mat-error>
+
+          <mat-radio-group formControlName="gender">
+            <mat-radio-button value="Male">Male</mat-radio-button>
+            <mat-radio-button value="Female">Female</mat-radio-button>
+            <mat-radio-button value="Diverse">Diverse</mat-radio-button>
+          </mat-radio-group>
+          <mat-error *ngIf="isInvalid('gender')">
+            Please provide a valid gender
+          </mat-error>
 
           <button mat-flat-button color="primary" class="register-btn">
             Register account

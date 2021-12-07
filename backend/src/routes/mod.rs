@@ -7,8 +7,10 @@ use rocket_okapi::mount_endpoints_and_merged_docs;
 use rocket_okapi::okapi::schemars;
 use rocket_okapi::okapi::schemars::JsonSchema;
 
+mod addresses;
 mod docs;
 mod login;
+mod offers;
 mod users;
 
 #[derive(Deserialize, Serialize, JsonSchema)]
@@ -63,6 +65,8 @@ pub fn init() -> Rocket<Build> {
     mount_endpoints_and_merged_docs! {
         rocket, "/v1".to_owned(), openapi_settings,
         "/users" => users::get_routes_and_docs(&openapi_settings),
+        "/addresses" => addresses::get_routes_and_docs(&openapi_settings),
+        "/offers" => offers::get_routes_and_docs(&openapi_settings),
         "/users/login" => login::get_routes_and_docs(&openapi_settings),
     };
 

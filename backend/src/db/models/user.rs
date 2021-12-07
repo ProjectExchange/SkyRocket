@@ -2,8 +2,11 @@ use super::DbResult;
 use crate::db::models::role::Role;
 use crate::db::models::UserRole;
 use crate::db::{schema::users, Db};
+use crate::routes::{error, ApiResult};
 use crate::session;
+use chrono::NaiveDate;
 use diesel::prelude::*;
+use diesel_derive_enum::DbEnum;
 use oso::{Oso, PolarClass};
 use rocket::http::Status;
 use rocket::request::{FromRequest, Outcome};
@@ -14,17 +17,34 @@ use rocket_okapi::gen::OpenApiGenerator;
 use rocket_okapi::okapi::schemars;
 use rocket_okapi::okapi::schemars::JsonSchema;
 use rocket_okapi::request::{OpenApiFromRequest, RequestHeaderInput};
+use validator::Validate;
 
-#[derive(Debug, Clone, Deserialize, Serialize, Insertable, JsonSchema, AsChangeset)]
+#[derive(Debug, Clone, Deserialize, Serialize, DbEnum, JsonSchema)]
+#[serde(crate = "rocket::serde")]
+pub enum Gender {
+    Male,
+    Female,
+    Diverse,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize, Insertable, JsonSchema, AsChangeset, Validate)]
 #[serde(crate = "rocket::serde")]
 #[table_name = "users"]
 pub struct NewUser {
     pub firstname: String,
     pub lastname: String,
+    #[validate(email)]
     pub email: String,
+    pub birthday: NaiveDate,
+    pub gender: Gender,
 }
 
 impl NewUser {
+    pub fn is_valid(&self) -> ApiResult<()> {
+        self.validate()
+            .map_err(|e| error(Status::BadRequest, &e.to_string()))
+    }
+
     pub async fn save(db: &Db, user: NewUser) -> Option<usize> {
         db.run(move |conn| diesel::insert_into(users::table).values(user).execute(conn))
             .await
@@ -46,6 +66,8 @@ pub struct User {
     pub firstname: String,
     pub lastname: String,
     pub email: String,
+    pub birthday: NaiveDate,
+    pub gender: Gender,
 }
 
 impl User {
@@ -56,6 +78,8 @@ impl User {
             firstname: String::new(),
             lastname: String::new(),
             email: String::new(),
+            birthday: NaiveDate::from_yo(1970, 1),
+            gender: Gender::Male,
         }
     }
 
@@ -85,7 +109,8 @@ impl User {
                 .set(new_user)
                 .execute(conn)
         })
-        .await.ok()?;
+        .await
+        .ok()?;
 
         User::find_by_id(db, id).await
     }
@@ -124,6 +149,8 @@ pub struct AuthUser {
     pub firstname: String,
     pub lastname: String,
     pub email: String,
+    pub birthday: NaiveDate,
+    pub gender: Gender,
     #[polar(attribute)]
     pub roles: Vec<Role>,
 }
@@ -149,6 +176,8 @@ impl AuthUser {
             firstname: user.firstname.clone(),
             lastname: user.lastname.clone(),
             email: user.email.clone(),
+            birthday: user.birthday.clone(),
+            gender: user.gender.clone(),
             roles,
         }
     }

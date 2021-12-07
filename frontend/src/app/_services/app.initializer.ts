@@ -1,4 +1,4 @@
-import { User, UsersService } from '@skyrocket/ng-api-client';
+import { AuthUser, UsersService } from '@skyrocket/ng-api-client';
 import { AuthService } from './auth.service';
 
 export function appInitializer(
@@ -8,7 +8,7 @@ export function appInitializer(
   return (): Promise<void> => new Promise((resolve) => {
     userService
       .profile()
-      .subscribe((user: User) => {
+      .subscribe((user: AuthUser) => {
         /* eslint no-param-reassign: "error" */
         authService.user = user;
       })

@@ -18,6 +18,9 @@ async fn create(
     cookies: &CookieJar<'_>,
     new_user: Json<NewUser>,
 ) -> ApiResult<Json<AuthUser>> {
+    // validate user object
+    new_user.clone().is_valid()?;
+
     // save user value to db
     let user = new_user
         .save_and_return(&db)
@@ -92,6 +95,9 @@ async fn update(
     new_user: Json<NewUser>,
 ) -> ApiResult<Json<User>> {
     if oso.is_allowed(actor, OsoAction::Update, User::dummy(id)) {
+        // validate user object
+        new_user.clone().is_valid()?;
+
         User::update_and_return(&db, id, new_user.clone())
             .await
             .ok_or(error(Status::InternalServerError, ""))
