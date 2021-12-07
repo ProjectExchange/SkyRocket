@@ -49,7 +49,7 @@ fn init_oso_arc() -> Result<OsoArc> {
 
     crate::db::models::register_polar_classes(&mut oso)?;
 
-    oso.load_files(vec!["security/users.polar"])?;
+    oso.load_files(vec!["security/users.polar", "security/addresses.polar"])?;
 
     Ok(OsoArc {
         oso: Arc::new(Mutex::new(oso)),

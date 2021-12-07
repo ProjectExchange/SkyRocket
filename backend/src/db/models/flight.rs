@@ -1,11 +1,13 @@
 use crate::db::models::DbResult;
 use crate::db::Db;
 use crate::db::{schema::flights, schema::flights_offers};
+use crate::routes::{error, ApiResult};
 use chrono::NaiveDateTime;
 use diesel::prelude::*;
 use diesel_derive_enum::DbEnum;
 use once_cell::sync::Lazy;
 use regex::Regex;
+use rocket::http::Status;
 use rocket::serde::json::Json;
 use rocket::serde::{Deserialize, Serialize};
 use rocket_okapi::okapi::schemars;
@@ -27,11 +29,18 @@ static RE_ICAO: Lazy<Regex> = Lazy::new(|| Regex::new(r"[A-Z]{4}$").unwrap());
 #[validate(schema(function = "arrival_greater_departure"))]
 pub struct NewFlight {
     #[validate(regex = "RE_ICAO")]
-    departure_icao: String,
-    departure_time: NaiveDateTime,
+    pub departure_icao: String,
+    pub departure_time: NaiveDateTime,
     #[validate(regex = "RE_ICAO")]
-    arrival_icao: String,
-    arrival_time: NaiveDateTime,
+    pub arrival_icao: String,
+    pub arrival_time: NaiveDateTime,
+}
+
+impl NewFlight {
+    pub fn is_valid(&self) -> ApiResult<()> {
+        self.validate()
+            .map_err(|e| error(Status::BadRequest, &e.to_string()))
+    }
 }
 
 /// Custom validator function to make sure arrival succeeds departure
@@ -49,11 +58,11 @@ fn arrival_greater_departure(flight: &NewFlight) -> Result<(), ValidationError> 
 #[serde(crate = "rocket::serde")]
 #[table_name = "flights"]
 pub struct InsertableFlight {
-    offer_id: i32,
-    departure_icao: String,
-    departure_time: NaiveDateTime,
-    arrival_icao: String,
-    arrival_time: NaiveDateTime,
+    pub offer_id: i32,
+    pub departure_icao: String,
+    pub departure_time: NaiveDateTime,
+    pub arrival_icao: String,
+    pub arrival_time: NaiveDateTime,
 }
 
 impl InsertableFlight {
@@ -100,6 +109,13 @@ pub struct NewFlightOffer {
     #[validate(range(min = 1, max = 99999))]
     price: f32,
     currency: Currency,
+}
+
+impl NewFlightOffer {
+    pub fn is_valid(&self) -> ApiResult<()> {
+        self.validate()
+            .map_err(|e| error(Status::BadRequest, &e.to_string()))
+    }
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize, Identifiable, Queryable, JsonSchema)]
