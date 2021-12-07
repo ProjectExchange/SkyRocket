@@ -1,0 +1,30 @@
+<mat-toolbar class="app-header">
+  <span [style.cursor]="'pointer'" routerLink="/">SkyRocket</span>
+  <span>&nbsp;</span>
+  <mat-icon>work</mat-icon>
+  <span class="h-spacer"></span>
+  <a
+    *ngIf="!authService.isLoggedIn"
+    mat-stroked-button
+    color="primary"
+    href="/login"
+    >Login</a
+  >
+  <div *ngIf="authService.isLoggedIn">
+    <span class="navbar-text">Hi {{ authService.firstname }}!</span>
+    <a class="navbar-btn" mat-stroked-button color="primary" href="/profile"
+      >Profile</a
+    >
+    <a class="navbar-btn" mat-stroked-button color="primary" href="/logout"
+      >Logout</a
+    >
+  </div>
+</mat-toolbar>
+
+<router-outlet></router-outlet>
+
+<div class="footer-spacer"></div>
+
+<mat-toolbar id="footer" class="app-footer">
+  <span class="mh-auto">&copy; 2021 SkyRocket</span>
+</mat-toolbar>

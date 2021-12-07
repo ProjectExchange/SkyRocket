@@ -23,6 +23,9 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
+        with:
+          # Disabling shallow clone is recommended for improving relevancy of reporting
+          fetch-depth: 0
 
       # Install Rust component clippy
       - name: Install clippy
@@ -31,6 +34,16 @@ jobs:
       # Generate clippy report for SonarQube analysis
       - name: Generate clippy report
         run: cd backend/ && cargo clippy --message-format=json &> clippy.report
+
+      - name: Build @skyrocket/ng-api-client
+        run: cd lib/ng-api-client && npm ci && npm run build
+
+      - name: Generate karma test report
+        run: |
+          cd frontend/
+          npm ci
+          npm link ../lib/ng-api-client/dist/
+          npm run test:report
 
       # Runs a single command using the runners shell
       - name: SonarQube scan
