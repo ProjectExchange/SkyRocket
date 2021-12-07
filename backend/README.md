@@ -12,7 +12,7 @@ OAUTH_GITHUB_CLIENT_SECRET=<YOUR_CLIENT_SECRET>
 ```
 
 `ROCKET_SECRET_KEY` is either a base64 encoded string which has a raw length of 44 or 88 characters,
-or a length of 64 if hex-encoded. On linux, simply executed `pwgen -y 88 | head -1 | base64 | tail -1`
+or a length of 64 if hex-encoded. On linux, simply executed `openssl rand -base64 32`
 
 ### GitHub OAuth Credentials
 To generate the GitHub client credentials, go to your `GitHub Account > Settings > Developer
