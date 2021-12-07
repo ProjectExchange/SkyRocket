@@ -1,5 +1,5 @@
 table! {
-    adresses (id) {
+    addresses (id) {
         id -> Integer,
         user_id -> Integer,
         country -> Varchar,
@@ -78,7 +78,7 @@ table! {
     }
 }
 
-joinable!(adresses -> users (user_id));
+joinable!(addresses -> users (user_id));
 joinable!(bookings -> flights_offers (offer_id));
 joinable!(bookings -> users (user_id));
 joinable!(flights -> flights_offers (offer_id));
@@ -87,7 +87,7 @@ joinable!(users_oauth_github -> users (user_id));
 joinable!(users_roles -> users (user_id));
 
 allow_tables_to_appear_in_same_query!(
-    adresses,
+    addresses,
     bookings,
     flights,
     flights_offers,

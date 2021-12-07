@@ -1,8 +1,10 @@
+mod address;
 mod flight;
 mod github_oauth_user;
 mod role;
 mod user;
 
+pub use address::{Address, NewAddress};
 pub use flight::{Currency, CurrencyMapping};
 pub use github_oauth_user::{GitHubOAuthUser, GithubOAuthRegistrar};
 pub use role::{AdminRole, Role, RoleMapping, UserRole};
