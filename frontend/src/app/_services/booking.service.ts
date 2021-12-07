@@ -15,8 +15,10 @@ export interface Booking {
   providedIn: 'root',
 })
 export class BookingService implements Booking {
-  #departure: string = '';
-  #arrival: string = '';
+  #departure = '';
+
+  #arrival = '';
+
   #travelPeriod: TravelPeriod = {
     dateDeparture: new Date(),
     dateArrival: new Date(),
@@ -28,27 +30,27 @@ export class BookingService implements Booking {
     this.#departure = departure;
   }
 
-  set arrival(arrival: string) {
-    this.#arrival = arrival;
-  }
-
-  set travelPeriod(travelPeriod: TravelPeriod) {
-    this.#travelPeriod = travelPeriod;
-  }
-
   get departure(): string {
     return this.#departure || '';
+  }
+
+  set arrival(arrival: string) {
+    this.#arrival = arrival;
   }
 
   get arrival(): string {
     return this.#arrival || '';
   }
 
+  set travelPeriod(travelPeriod: TravelPeriod) {
+    this.#travelPeriod = travelPeriod;
+  }
+
   get dateDeparture(): Date {
-    return this.#travelPeriod['dateDeparture'];
+    return this.#travelPeriod.dateDeparture;
   }
 
   get dateArrival(): Date {
-    return this.#travelPeriod['dateArrival'];
+    return this.#travelPeriod.dateArrival;
   }
 }

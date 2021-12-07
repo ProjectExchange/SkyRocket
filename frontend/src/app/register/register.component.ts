@@ -1,7 +1,5 @@
-import { Component, ElementRef } from '@angular/core';
-import {
-  FormBuilder, FormGroup, Validators,
-} from '@angular/forms';
+import { Component } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthUser, UsersService } from '@skyrocket/ng-api-client';
 import { AuthService } from '../_services/auth.service';
@@ -16,29 +14,18 @@ export class RegisterComponent {
 
   constructor(
     private authService: AuthService,
-    private elementRef: ElementRef,
     private formBuilder: FormBuilder,
     private router: Router,
     private usersService: UsersService,
   ) {
     this.registerForm = this.formBuilder.group({
-      firstname: [
-        this.authService.firstname,
-        [Validators.required.bind(this)],
-      ],
-      lastname: [
-        this.authService.lastname,
-        [Validators.required.bind(this)],
-      ],
+      firstname: [this.authService.firstname, [Validators.required.bind(this)]],
+      lastname: [this.authService.lastname, [Validators.required.bind(this)]],
       email: [
         this.authService.email,
         [Validators.required.bind(this), Validators.email.bind(this)],
       ],
     });
-  }
-
-  ngAfterViewInit() {
-    this.elementRef.nativeElement.ownerDocument.body.style.backgroundImage = 'url("../../assets/img/berg-5128982_1920.jpg")';
   }
 
   form(control: string): string {
@@ -47,13 +34,15 @@ export class RegisterComponent {
 
   onSubmit(): void {
     if (!this.registerForm.valid) return;
-    this.usersService.create({
-      email: this.form('email'),
-      firstname: this.form('firstname'),
-      lastname: this.form('lastname'),
-    }).subscribe((user: AuthUser) => {
-      this.authService.user = user;
-      this.router.navigate(['/profile']);
-    });
+    this.usersService
+      .create({
+        email: this.form('email'),
+        firstname: this.form('firstname'),
+        lastname: this.form('lastname'),
+      })
+      .subscribe((user: AuthUser) => {
+        this.authService.user = user;
+        this.router.navigate(['/profile']);
+      });
   }
 }

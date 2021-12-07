@@ -11,12 +11,20 @@
         <mat-step>
           <ng-template matStepLabel>Check your flight data</ng-template>
           <mat-list>
-            <mat-list-item>Departure&emsp;<strong>{{ departure }}</strong></mat-list-item>
+            <mat-list-item
+              >Departure&emsp;<strong>{{ departure }}</strong></mat-list-item
+            >
             <mat-divider></mat-divider>
-            <mat-list-item>Arrival&emsp;<strong>{{ arrival }}</strong></mat-list-item>
+            <mat-list-item
+              >Arrival&emsp;<strong>{{ arrival }}</strong></mat-list-item
+            >
             <mat-divider></mat-divider>
-            <mat-list-item>Date from/to&emsp;<strong>{{ dateDeparture }} - {{ dateArrival }}</strong></mat-list-item>
-          </mat-list>        
+            <mat-list-item
+              >Date from/to&emsp;<strong
+                >{{ dateDeparture }} - {{ dateArrival }}</strong
+              ></mat-list-item
+            >
+          </mat-list>
           <div>
             <button mat-stroked-button matStepperNext>Next</button>
           </div>
@@ -30,8 +38,11 @@
               <mat-form-field appearance="fill">
                 <mat-label>Flight</mat-label>
                 <mat-select name="flight" formControlName="flight">
-                  <mat-option *ngFor="let flight of flights" [value]="flight.value">
-                    {{flight.viewValue}}
+                  <mat-option
+                    *ngFor="let flight of flights"
+                    [value]="flight.value"
+                  >
+                    {{ flight.viewValue }}
                   </mat-option>
                 </mat-select>
               </mat-form-field>
@@ -49,11 +60,21 @@
             <ng-template matStepLabel>Check your name</ng-template>
             <mat-form-field class="content-book-input" appearance="fill">
               <mat-label>Firstname</mat-label>
-              <input matInput formControlName="firstname" placeholder="Firstname" required>
+              <input
+                matInput
+                formControlName="firstname"
+                placeholder="Firstname"
+                required
+              />
             </mat-form-field>
             <mat-form-field appearance="fill">
               <mat-label>Lastname</mat-label>
-              <input matInput formControlName="lastname" placeholder="Lastname" required>
+              <input
+                matInput
+                formControlName="lastname"
+                placeholder="Lastname"
+                required
+              />
             </mat-form-field>
             <div>
               <button mat-button matStepperPrevious>Back</button>
@@ -70,8 +91,11 @@
               <mat-form-field appearance="fill">
                 <mat-label>Address</mat-label>
                 <mat-select name="address" formControlName="address">
-                  <mat-option *ngFor="let address of addresses" [value]="address.value">
-                    {{address.viewValue}}
+                  <mat-option
+                    *ngFor="let address of addresses"
+                    [value]="address.value"
+                  >
+                    {{ address.viewValue }}
                   </mat-option>
                 </mat-select>
               </mat-form-field>
@@ -91,7 +115,7 @@
             <button mat-button (click)="stepper.reset()">Reset</button>
           </div>
         </mat-step>
-      </mat-stepper>      
+      </mat-stepper>
     </div>
   </div>
 </div>

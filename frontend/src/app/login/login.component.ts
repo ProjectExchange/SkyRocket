@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { LoginService, OAuthProviders } from '@skyrocket/ng-api-client';
 
 @Component({
@@ -9,17 +9,10 @@ import { LoginService, OAuthProviders } from '@skyrocket/ng-api-client';
 export class LoginComponent implements OnInit {
   public oAuthEndpoints: OAuthProviders = {};
 
-  constructor(
-    private loginService: LoginService,
-    private elementRef: ElementRef,
-  ) {}
+  constructor(private loginService: LoginService) {}
 
   ngOnInit(): void {
     this.fetchOAuthEndpoints();
-  }
-
-  ngAfterViewInit() {
-    this.elementRef.nativeElement.ownerDocument.body.style.backgroundImage = 'url("../../assets/img/berg-5128982_1920.jpg")';
   }
 
   fetchOAuthEndpoints(): void {

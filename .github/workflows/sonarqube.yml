@@ -35,8 +35,15 @@ jobs:
       - name: Generate clippy report
         run: cd backend/ && cargo clippy --message-format=json &> clippy.report
 
+      - name: Build @skyrocket/ng-api-client
+        run: cd lib/ng-api-client && npm ci && npm run build
+
       - name: Generate karma test report
-        run: cd frontend/ && npm ci && npm run test:report
+        run: |
+          cd frontend/
+          npm ci
+          npm link ../lib/ng-api-client/dist/
+          npm run test:report
 
       # Runs a single command using the runners shell
       - name: SonarQube scan

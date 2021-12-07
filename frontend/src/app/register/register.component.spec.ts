@@ -1,4 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ReactiveFormsModule } from '@angular/forms';
+import { RouterTestingModule } from '@angular/router/testing';
+import { UsersService } from '@skyrocket/ng-api-client';
 
 import { RegisterComponent } from './register.component';
 
@@ -9,8 +12,9 @@ describe('RegisterComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [RegisterComponent],
-    })
-      .compileComponents();
+      imports: [ReactiveFormsModule, RouterTestingModule],
+      providers: [{ provide: UsersService, useValue: UsersService }],
+    }).compileComponents();
   });
 
   beforeEach(() => {

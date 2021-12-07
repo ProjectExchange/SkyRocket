@@ -5,12 +5,8 @@ import { AppComponent } from './app.component';
 describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [
-        RouterTestingModule,
-      ],
-      declarations: [
-        AppComponent,
-      ],
+      imports: [RouterTestingModule],
+      declarations: [AppComponent],
     }).compileComponents();
   });
 
@@ -20,7 +16,7 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it('should have as title \'SkyRocket\'', () => {
+  it("should have as title 'SkyRocket'", () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
     expect(app.title).toEqual('SkyRocket');
@@ -31,6 +27,8 @@ describe('AppComponent', () => {
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
     const heading = compiled.querySelector('#footer')?.textContent;
-    expect(heading).withContext(`footer: ${heading}`).toContain(`© ${new Date().getFullYear()}`);
+    expect(heading)
+      .withContext(`footer: ${heading}`)
+      .toContain(`© ${new Date().getFullYear()}`);
   });
 });
