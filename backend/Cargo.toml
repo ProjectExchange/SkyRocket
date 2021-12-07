@@ -42,3 +42,7 @@ features = ["swagger", "rapidoc"]
 [dependencies.schemars]
 version = "0.8.8"
 features = ["chrono"]
+
+[dependencies.validator]
+version = "0.14.0"
+features = ["derive"]
