@@ -9,15 +9,10 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-import { Gender } from './gender';
-import { Role } from './role';
+import { Currency } from './currency';
 
-export interface AuthUser { 
-    id: number;
-    firstname: string;
-    lastname: string;
-    email: string;
-    birthday: string;
-    gender: Gender;
-    roles: Array<Role>;
+export interface NewFlightOffer { 
+    seats: number;
+    price: number;
+    currency: Currency;
 }
