@@ -27,6 +27,13 @@ jobs:
           # Disabling shallow clone is recommended for improving relevancy of reporting
           fetch-depth: 0
 
+      # Rust cache
+      - uses: Swatinem/rust-cache@v1
+        with:
+          working-directory: ./backend/
+          target-dir: ./backend/target/
+          cache-on-failure: true
+
       # Install Rust component clippy
       - name: Install clippy
         run: rustup component add clippy
@@ -42,7 +49,7 @@ jobs:
           cargo clippy --message-format=json &> clippy.report
           # Generate coverage report
           cargo tarpaulin --out Lcov
-          sed -i s#SF:.*/backend#SF:backend#g backend/lcov.info
+          sed -i s#SF:.*/backend#SF:backend#g ./lcov.info
 
       - name: Build @skyrocket/ng-api-client
         run: cd lib/ng-api-client && npm ci && npm run build
