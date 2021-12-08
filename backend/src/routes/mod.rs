@@ -23,7 +23,11 @@ pub type ApiError = status::Custom<Json<ErrorBody>>;
 
 pub type ApiResult<T> = std::result::Result<T, ApiError>;
 
-pub fn error(status: Status, message: &str) -> ApiError {
+pub fn error<Error>(err: Error, status: Status, message: &str) -> ApiError
+where
+    Error: ToString,
+{
+    eprintln! { "{}", err.to_string() };
     status::Custom(
         status,
         Json(ErrorBody {

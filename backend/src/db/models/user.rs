@@ -56,7 +56,7 @@ fn is_adult(birthday: &NaiveDate) -> Result<(), ValidationError> {
 impl NewUser {
     pub fn is_valid(&self) -> ApiResult<()> {
         self.validate()
-            .map_err(|e| error(Status::BadRequest, &e.to_string()))
+            .map_err(|e| error(e.clone(), Status::BadRequest, &e.to_string()))
     }
 
     pub async fn save(db: &Db, user: NewUser) -> Option<usize> {

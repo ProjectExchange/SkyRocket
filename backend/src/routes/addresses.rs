@@ -19,11 +19,12 @@ async fn create(
     new_addr: Json<NewAddress>,
 ) -> ApiResult<()> {
     if oso.is_allowed(actor, OsoAction::Create, Address::dummy_for_user(id)) {
-        Address::save(&db, id, new_addr.clone())
-            .await
-            .map_or(Err(error(Status::InternalServerError, "")), |_res| Ok(()))
+        Address::save(&db, id, new_addr.clone()).await.map_or_else(
+            |e| Err(error(e, Status::InternalServerError, "")),
+            |_res| Ok(()),
+        )
     } else {
-        Err(error(Status::Forbidden, "Forbidden"))
+        Err(error("", Status::Forbidden, "Forbidden"))
     }
 }
 
@@ -33,7 +34,7 @@ async fn read(oso: &OsoState, actor: AuthUser, db: Db, id: i32) -> ApiResult<Jso
     if oso.is_allowed(actor, OsoAction::Read, Address::dummy_for_user(id)) {
         Ok(Json(Address::all_from_user(&db, id).await))
     } else {
-        Err(error(Status::Forbidden, "Forbidden"))
+        Err(error("", Status::Forbidden, "Forbidden"))
     }
 }
 

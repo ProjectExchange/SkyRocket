@@ -18,11 +18,11 @@ async fn create_offer(
 
     FlightOffer::save(&db, new_offer.clone())
         .await
-        .map_err(|_e| error(Status::InternalServerError, ""))?;
+        .map_err(|e| error(e, Status::InternalServerError, ""))?;
 
     FlightOffer::last_inserted(&db)
         .await
-        .ok_or_else(|| error(Status::InternalServerError, ""))
+        .ok_or_else(|| error("", Status::InternalServerError, ""))
 }
 
 #[openapi(tag = "Flights")]
@@ -51,6 +51,7 @@ async fn create_flights(
             prev_time = flight.arrival_time.clone().timestamp();
         } else {
             return Err(error(
+                "Invalid array of flights",
                 Status::BadRequest,
                 "Departure of a flight must succeed arrival of previous flight",
             ));
@@ -60,7 +61,10 @@ async fn create_flights(
 
     FlightOffer::save_flights(&db, id, new_flights)
         .await
-        .map_or(Err(error(Status::InternalServerError, "")), |_res| Ok(()))
+        .map_or_else(
+            |e| Err(error(e, Status::InternalServerError, "")),
+            |_res| Ok(()),
+        )
 }
 
 pub fn get_routes_and_docs(settings: &OpenApiSettings) -> (Vec<rocket::Route>, OpenApi) {

@@ -145,7 +145,55 @@ mod tests {
             true,
             OSO.is_allowed(
                 AuthUser::dummy_admin(1),
-                OsoAction::Read,
+                OsoAction::Create,
+                Address::dummy_for_user(2)
+            )
+        );
+    }
+
+    #[test]
+    fn test_user_create_own_addresses() {
+        assert_eq!(
+            true,
+            OSO.is_allowed(
+                AuthUser::dummy(1),
+                OsoAction::Create,
+                Address::dummy_for_user(1)
+            )
+        );
+    }
+
+    #[test]
+    fn test_user_create_other_addresses() {
+        assert_eq!(
+            false,
+            OSO.is_allowed(
+                AuthUser::dummy(1),
+                OsoAction::Create,
+                Address::dummy_for_user(2)
+            )
+        );
+    }
+
+    #[test]
+    fn test_admin_user_create_own_addresses() {
+        assert_eq!(
+            true,
+            OSO.is_allowed(
+                AuthUser::dummy_admin(1),
+                OsoAction::Create,
+                Address::dummy_for_user(1)
+            )
+        );
+    }
+
+    #[test]
+    fn test_admin_user_create_other_addresses() {
+        assert_eq!(
+            true,
+            OSO.is_allowed(
+                AuthUser::dummy_admin(1),
+                OsoAction::Create,
                 Address::dummy_for_user(2)
             )
         );

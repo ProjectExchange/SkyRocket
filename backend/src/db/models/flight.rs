@@ -43,7 +43,7 @@ pub struct NewFlight {
 impl NewFlight {
     pub fn is_valid(&self) -> ApiResult<()> {
         self.validate()
-            .map_err(|e| error(Status::BadRequest, &e.to_string()))
+            .map_err(|e| error(e.clone(), Status::BadRequest, &e.to_string()))
     }
 }
 
@@ -123,7 +123,7 @@ pub struct NewFlightOffer {
 impl NewFlightOffer {
     pub fn is_valid(&self) -> ApiResult<()> {
         self.validate()
-            .map_err(|e| error(Status::BadRequest, &e.to_string()))
+            .map_err(|e| error(e.clone(), Status::BadRequest, &e.to_string()))
     }
 }
 

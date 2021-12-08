@@ -25,7 +25,7 @@ async fn create(
     let user = new_user
         .save_and_return(&db)
         .await
-        .ok_or_else(|| error(Status::InternalServerError, ""))?;
+        .ok_or_else(|| error("", Status::InternalServerError, ""))?;
 
     // link user to GitHub OAuth account
     GitHubOAuthUser::save(
@@ -36,19 +36,19 @@ async fn create(
         },
     )
     .await
-    .ok_or_else(|| error(Status::InternalServerError, ""))?;
+    .ok_or_else(|| error("", Status::InternalServerError, ""))?;
 
     // add administrator rights if user was first user
     if user.is_first(&db).await {
         user.attach_role(&db, Role::Admin)
             .await
-            .map_err(|_e| error(Status::InternalServerError, ""))?;
+            .map_err(|e| error(e, Status::InternalServerError, ""))?;
     }
 
     // fetch permissions of the given user
     let auth_user = AuthUser::by_user_id(&db, user.id)
         .await
-        .ok_or_else(|| error(Status::InternalServerError, ""))?;
+        .ok_or_else(|| error("", Status::InternalServerError, ""))?;
 
     session::revoke(cookies).await;
     session::set_user(cookies, auth_user.clone()).await;
@@ -60,7 +60,7 @@ async fn create(
 async fn list_for_admin(_r: AdminRole, db: Db) -> ApiResult<Json<Vec<User>>> {
     User::get_all(&db)
         .await
-        .ok_or_else(|| error(Status::InternalServerError, ""))
+        .ok_or_else(|| error("", Status::InternalServerError, ""))
 }
 
 #[openapi(tag = "Users")]
@@ -68,7 +68,7 @@ async fn list_for_admin(_r: AdminRole, db: Db) -> ApiResult<Json<Vec<User>>> {
 async fn list_for_user(actor: AuthUser, db: Db) -> ApiResult<Json<Vec<User>>> {
     let user = User::find_by_id(&db, actor.id)
         .await
-        .ok_or_else(|| error(Status::InternalServerError, ""))?;
+        .ok_or_else(|| error("", Status::InternalServerError, ""))?;
     Ok(Json(vec![user.into_inner()]))
 }
 
@@ -77,11 +77,11 @@ async fn list_for_user(actor: AuthUser, db: Db) -> ApiResult<Json<Vec<User>>> {
 async fn read(actor: AuthUser, oso: &OsoState, db: Db, id: i32) -> ApiResult<Json<User>> {
     let resource = User::find_by_id(&db, id)
         .await
-        .ok_or_else(|| error(Status::NotFound, ""))?;
+        .ok_or_else(|| error("", Status::NotFound, ""))?;
     if oso.is_allowed(actor, OsoAction::Read, resource.clone()) {
         Ok(resource)
     } else {
-        Err(error(Status::Forbidden, "Forbidden"))
+        Err(error("", Status::Forbidden, "Forbidden"))
     }
 }
 
@@ -100,9 +100,9 @@ async fn update(
 
         User::update_and_return(&db, id, new_user.clone())
             .await
-            .ok_or_else(|| error(Status::InternalServerError, ""))
+            .ok_or_else(|| error("", Status::InternalServerError, ""))
     } else {
-        Err(error(Status::Forbidden, "Forbidden"))
+        Err(error("", Status::Forbidden, "Forbidden"))
     }
 }
 
@@ -112,9 +112,9 @@ async fn delete(actor: AuthUser, oso: &OsoState, db: Db, id: i32) -> ApiResult<(
     if oso.is_allowed(actor, OsoAction::Delete, User::dummy(id)) {
         User::delete(&db, id)
             .await
-            .ok_or_else(|| error(Status::NotFound, ""))
+            .ok_or_else(|| error("", Status::NotFound, ""))
     } else {
-        Err(error(Status::Forbidden, "Forbidden"))
+        Err(error("", Status::Forbidden, "Forbidden"))
     }
 }
 
@@ -122,7 +122,7 @@ async fn delete(actor: AuthUser, oso: &OsoState, db: Db, id: i32) -> ApiResult<(
 #[get("/profile")]
 async fn profile(cookies: &CookieJar<'_>) -> ApiResult<Json<AuthUser>> {
     session::get_user_from_session(cookies).await.map_or(
-        Err(error(Status::Forbidden, "You are not logged in")),
+        Err(error("", Status::Forbidden, "You are not logged in")),
         |u| Ok(Json(u)),
     )
 }
@@ -132,7 +132,7 @@ async fn profile(cookies: &CookieJar<'_>) -> ApiResult<Json<AuthUser>> {
 async fn logout(cookies: &CookieJar<'_>) -> ApiResult<()> {
     session::revoke(cookies)
         .await
-        .ok_or_else(|| error(Status::Unauthorized, "No session to revoke"))
+        .ok_or_else(|| error("", Status::Unauthorized, "No session to revoke"))
 }
 
 pub fn get_routes_and_docs(settings: &OpenApiSettings) -> (Vec<rocket::Route>, OpenApi) {
