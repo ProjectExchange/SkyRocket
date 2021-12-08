@@ -61,16 +61,21 @@ export class AddressesService {
      * 
      * 
      * @param body 
+     * @param id 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public create(body: NewAddress, observe?: 'body', reportProgress?: boolean): Observable<any>;
-    public create(body: NewAddress, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
-    public create(body: NewAddress, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
-    public create(body: NewAddress, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public create(body: NewAddress, id: number, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public create(body: NewAddress, id: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public create(body: NewAddress, id: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public create(body: NewAddress, id: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
         if (body === null || body === undefined) {
             throw new Error('Required parameter body was null or undefined when calling create.');
+        }
+
+        if (id === null || id === undefined) {
+            throw new Error('Required parameter id was null or undefined when calling create.');
         }
 
         let headers = this.defaultHeaders;
@@ -93,7 +98,7 @@ export class AddressesService {
             headers = headers.set('Content-Type', httpContentTypeSelected);
         }
 
-        return this.httpClient.request<any>('post',`${this.basePath}/addresses/`,
+        return this.httpClient.request<any>('post',`${this.basePath}/users/${encodeURIComponent(String(id))}/addresses`,
             {
                 body: body,
                 withCredentials: this.configuration.withCredentials,
@@ -107,13 +112,18 @@ export class AddressesService {
     /**
      * 
      * 
+     * @param id 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public read(observe?: 'body', reportProgress?: boolean): Observable<Array<Address>>;
-    public read(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<Address>>>;
-    public read(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<Address>>>;
-    public read(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public read(id: number, observe?: 'body', reportProgress?: boolean): Observable<Array<Address>>;
+    public read(id: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<Address>>>;
+    public read(id: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<Address>>>;
+    public read(id: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+        if (id === null || id === undefined) {
+            throw new Error('Required parameter id was null or undefined when calling read.');
+        }
 
         let headers = this.defaultHeaders;
 
@@ -130,7 +140,7 @@ export class AddressesService {
         const consumes: string[] = [
         ];
 
-        return this.httpClient.request<Array<Address>>('get',`${this.basePath}/addresses/`,
+        return this.httpClient.request<Array<Address>>('get',`${this.basePath}/users/${encodeURIComponent(String(id))}/addresses`,
             {
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
