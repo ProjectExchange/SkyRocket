@@ -1,15 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AddressesService } from '@skyrocket/ng-api-client';
+import { Address, AddressesService } from '@skyrocket/ng-api-client';
 import { AuthService } from '../_services/auth.service';
-
-export interface Adress {
-  street: string;
-  houseNumber: number;
-  postalCode: number;
-  town: string;
-  country: string;
-}
 
 @Component({
   selector: 'app-profile',
@@ -27,7 +19,7 @@ export class ProfileComponent implements OnInit {
     'country',
   ];
 
-  dataSource: Adress[] = [];
+  dataSource: Address[] = [];
 
   constructor(
     private addressForm: FormBuilder,
