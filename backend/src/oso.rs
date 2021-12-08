@@ -66,7 +66,7 @@ pub fn init() -> OsoArc {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::db::models::{AuthUser, User};
+    use crate::db::models::{Address, AuthUser, User};
     use once_cell::sync::Lazy;
 
     static OSO: Lazy<OsoArc> = Lazy::new(init);
@@ -100,6 +100,38 @@ mod tests {
         assert_eq!(
             true,
             OSO.is_allowed(AuthUser::dummy_admin(1), OsoAction::Read, User::dummy(2))
+        );
+    }
+
+    #[test]
+    fn test_user_read_own_addresses() {
+        assert_eq!(
+            true,
+            OSO.is_allowed(AuthUser::dummy(1), OsoAction::Read, Address::dummy_for_user(1))
+        );
+    }
+
+    #[test]
+    fn test_user_read_other_addresses() {
+        assert_eq!(
+            false,
+            OSO.is_allowed(AuthUser::dummy(1), OsoAction::Read, Address::dummy_for_user(2))
+        );
+    }
+
+    #[test]
+    fn test_admin_user_read_own_addresses() {
+        assert_eq!(
+            true,
+            OSO.is_allowed(AuthUser::dummy_admin(1), OsoAction::Read, Address::dummy_for_user(1))
+        );
+    }
+
+    #[test]
+    fn test_admin_user_read_other_addresses() {
+        assert_eq!(
+            true,
+            OSO.is_allowed(AuthUser::dummy_admin(1), OsoAction::Read, Address::dummy_for_user(2))
         );
     }
 }
