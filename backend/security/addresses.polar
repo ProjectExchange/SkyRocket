@@ -1,12 +1,13 @@
 actor AuthUser {}
 
 resource Address {
-  permissions = ["read", "update", "delete"];
+  permissions = ["create", "read", "update", "delete"];
   roles = ["self", "Admin"];
 
   # admin user has all rights, that a user has on his own account
   "self" if "Admin";
 
+  "create" if "self";
   "read" if "self";
   "update" if "self";
   "delete" if "self";
