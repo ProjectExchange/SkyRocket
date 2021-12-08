@@ -1,6 +1,6 @@
 use dotenv::dotenv;
 use once_cell::sync::Lazy;
-use std::{env};
+use std::env;
 
 pub static CONFIG: Lazy<Config> = Lazy::new(Config::load);
 

@@ -107,7 +107,11 @@ mod tests {
     fn test_user_read_own_addresses() {
         assert_eq!(
             true,
-            OSO.is_allowed(AuthUser::dummy(1), OsoAction::Read, Address::dummy_for_user(1))
+            OSO.is_allowed(
+                AuthUser::dummy(1),
+                OsoAction::Read,
+                Address::dummy_for_user(1)
+            )
         );
     }
 
@@ -115,7 +119,11 @@ mod tests {
     fn test_user_read_other_addresses() {
         assert_eq!(
             false,
-            OSO.is_allowed(AuthUser::dummy(1), OsoAction::Read, Address::dummy_for_user(2))
+            OSO.is_allowed(
+                AuthUser::dummy(1),
+                OsoAction::Read,
+                Address::dummy_for_user(2)
+            )
         );
     }
 
@@ -123,7 +131,11 @@ mod tests {
     fn test_admin_user_read_own_addresses() {
         assert_eq!(
             true,
-            OSO.is_allowed(AuthUser::dummy_admin(1), OsoAction::Read, Address::dummy_for_user(1))
+            OSO.is_allowed(
+                AuthUser::dummy_admin(1),
+                OsoAction::Read,
+                Address::dummy_for_user(1)
+            )
         );
     }
 
@@ -131,7 +143,11 @@ mod tests {
     fn test_admin_user_read_other_addresses() {
         assert_eq!(
             true,
-            OSO.is_allowed(AuthUser::dummy_admin(1), OsoAction::Read, Address::dummy_for_user(2))
+            OSO.is_allowed(
+                AuthUser::dummy_admin(1),
+                OsoAction::Read,
+                Address::dummy_for_user(2)
+            )
         );
     }
 }
