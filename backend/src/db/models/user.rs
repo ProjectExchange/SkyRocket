@@ -44,8 +44,9 @@ pub struct NewUser {
 fn is_adult(birthday: &NaiveDate) -> Result<(), ValidationError> {
     let age_in_days = Utc::now()
         .naive_utc()
-        .signed_duration_since(birthday.and_hms(0, 0, 0)).num_days();
-    if  age_in_days / 365 > 18 {
+        .signed_duration_since(birthday.and_hms(0, 0, 0))
+        .num_days();
+    if age_in_days / 365 > 18 {
         Ok(())
     } else {
         Err(ValidationError::new("User must be older than 18 years"))
@@ -169,6 +170,16 @@ pub struct AuthUser {
 }
 
 impl AuthUser {
+    /// Creates a dummy AuthUser without admin role, required for oso unit tests
+    pub fn dummy(id: i32) -> Self {
+        AuthUser::new(Json(User::dummy(id)), Vec::new())
+    }
+
+    /// Creates a dummy AuthUser without admin role, required for oso unit tests
+    pub fn dummy_admin(id: i32) -> Self {
+        AuthUser::new(Json(User::dummy(id)), vec![Role::Admin])
+    }
+
     pub async fn by_user_id(db: &Db, id: i32) -> Option<Self> {
         let user = User::find_by_id(db, id).await?;
         let roles = UserRole::all_from_user(db, user.clone()).await;

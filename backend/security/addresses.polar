@@ -12,12 +12,11 @@ resource Address {
   "delete" if "self";
 }
 
-has_role(actor: AuthUser, "self", resource: User) if
+has_role(actor: AuthUser, "self", resource: Address) if
   actor.id = resource.user_id;
 
-has_role(actor: AuthUser, name: String, _: User) if
+has_role(actor: AuthUser, name: String, _: Address) if
   role in actor.roles and role = name;
 
 allow(actor, action, resource) if
   has_permission(actor, action, resource);
-
