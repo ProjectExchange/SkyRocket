@@ -12,13 +12,15 @@ use rocket_okapi::okapi::schemars::JsonSchema;
 #[serde(crate = "rocket::serde")]
 pub struct NewAddress {
     country: String,
+    #[serde(rename = "postalCode")]
     postal_code: i32,
     town: String,
     street: String,
+    #[serde(rename = "houseNumber")]
     house_number: i32,
 }
 
-#[derive(AsChangeset, Clone, Debug, Deserialize, Insertable, JsonSchema, Serialize)]
+#[derive(AsChangeset, Clone, Debug, Deserialize, Insertable, Serialize)]
 #[serde(crate = "rocket::serde")]
 #[table_name = "addresses"]
 pub struct InsertableAddress {
@@ -60,11 +62,14 @@ impl InsertableAddress {
 pub struct Address {
     id: i32,
     #[polar(attribute)]
+    #[serde(rename = "userId")]
     user_id: i32,
     country: String,
+    #[serde(rename = "postalCode")]
     postal_code: i32,
     town: String,
     street: String,
+    #[serde(rename = "houseNumber")]
     house_number: i32,
 }
 

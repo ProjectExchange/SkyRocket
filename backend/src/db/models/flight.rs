@@ -29,10 +29,14 @@ static RE_ICAO: Lazy<Regex> = Lazy::new(|| Regex::new(r"[A-Z]{4}$").unwrap());
 #[validate(schema(function = "arrival_greater_departure"))]
 pub struct NewFlight {
     #[validate(regex = "RE_ICAO")]
+    #[serde(rename = "departureIcao")]
     pub departure_icao: String,
+    #[serde(rename = "departureTime")]
     pub departure_time: NaiveDateTime,
     #[validate(regex = "RE_ICAO")]
+    #[serde(rename = "arrivalIcao")]
     pub arrival_icao: String,
+    #[serde(rename = "arrivalTime")]
     pub arrival_time: NaiveDateTime,
 }
 
@@ -85,11 +89,16 @@ impl InsertableFlight {
 #[table_name = "flights"]
 pub struct Flight {
     id: i32,
+    #[serde(rename = "offerId")]
     offer_id: i32,
-    departure_icao: String,
-    departure_time: NaiveDateTime,
-    arrival_icao: String,
-    arrival_time: NaiveDateTime,
+    #[serde(rename = "departureIcao")]
+    pub departure_icao: String,
+    #[serde(rename = "departureTime")]
+    pub departure_time: NaiveDateTime,
+    #[serde(rename = "arrivalIcao")]
+    pub arrival_icao: String,
+    #[serde(rename = "arrivalTime")]
+    pub arrival_time: NaiveDateTime,
 }
 
 impl Flight {
