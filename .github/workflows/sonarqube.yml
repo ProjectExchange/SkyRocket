@@ -31,7 +31,6 @@ jobs:
       - uses: Swatinem/rust-cache@v1
         with:
           working-directory: ./backend/
-          target-dir: ./backend/target/
           cache-on-failure: true
 
       # Install Rust component clippy
