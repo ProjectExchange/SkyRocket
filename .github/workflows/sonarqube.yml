@@ -33,7 +33,7 @@ jobs:
 
       # Install tarpaulin for test coverage reports
       - name: Install tarpaulin
-        run: cargo install tarpaulin
+        run: cargo install cargo-tarpaulin
 
       - name: Generate sonar report files
         run: |
