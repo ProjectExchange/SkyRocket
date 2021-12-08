@@ -1,7 +1,5 @@
-import { Country } from '@angular-material-extensions/select-country';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
 import { AddressesService } from '@skyrocket/ng-api-client';
 import { AuthService } from '../_services/auth.service';
 
@@ -35,7 +33,6 @@ export class ProfileComponent implements OnInit {
     private addressForm: FormBuilder,
     private addressesService: AddressesService,
     private authService: AuthService,
-    private router: Router
   ) {
     this.profileAddressForm = this.addressForm.group({
       street: ['', [Validators.required.bind(this)]],
@@ -72,7 +69,7 @@ export class ProfileComponent implements OnInit {
           street: this.form('street'),
           houseNumber: parseInt(this.form('houseNumber'), 10),
         },
-        this.authService.id
+        this.authService.id,
       )
       .subscribe(() => {
         this.ngOnInit();
