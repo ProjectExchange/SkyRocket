@@ -8,9 +8,9 @@ use rocket::serde::Serialize;
 
 pub static REDIS: Lazy<RedisSessionStore> = Lazy::new(load);
 
-const COOKIE_NAME: &'static str = "session";
-const SESSION_USER_NAME: &'static str = "user";
-const SESSION_GITHUB_ID_NAME: &'static str = "github_id";
+const COOKIE_NAME: &str = "session";
+const SESSION_USER_NAME: &str = "user";
+const SESSION_GITHUB_ID_NAME: &str = "github_id";
 
 /// initialize redis with connection string from config
 fn load() -> RedisSessionStore {

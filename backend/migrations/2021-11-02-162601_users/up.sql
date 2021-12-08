@@ -24,7 +24,7 @@ CREATE TABLE `users_roles` (
 );
 
 CREATE TABLE `addresses` (
-    `id` INT(255) NOT NULL,
+    `id` INT(255) NOT NULL AUTO_INCREMENT,
     `user_id` INT(255) NOT NULL,
     `country` VARCHAR(255) NOT NULL,
     `postal_code` INT(255) NOT NULL,
@@ -36,7 +36,7 @@ CREATE TABLE `addresses` (
 );
 
 CREATE TABLE `flights_offers` (
-    `id` INT(255) NOT NULL,
+    `id` INT(255) NOT NULL AUTO_INCREMENT,
     `seats` INT(255) NOT NULL,
     `price` FLOAT(7,2) NOT NULL,
     `currency` enum('dollar', 'euro') NOT NULL,
@@ -44,7 +44,7 @@ CREATE TABLE `flights_offers` (
 );
 
 CREATE TABLE `flights` (
-    `id` INT(255) NOT NULL,
+    `id` INT(255) NOT NULL AUTO_INCREMENT,
     `offer_id` INT(255) NOT NULL,
     `departure_icao` VARCHAR(4) NOT NULL,
     `departure_time` DATETIME NOT NULL,

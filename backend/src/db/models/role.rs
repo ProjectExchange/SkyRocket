@@ -68,7 +68,7 @@ impl UserRole {
                 .load::<Role>(conn)
         })
         .await
-        .unwrap_or(Vec::new())
+        .unwrap_or_else(|_| Vec::new())
     }
 }
 

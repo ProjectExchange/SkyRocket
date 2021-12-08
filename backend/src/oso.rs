@@ -49,7 +49,7 @@ fn init_oso_arc() -> Result<OsoArc> {
 
     crate::db::models::register_polar_classes(&mut oso)?;
 
-    oso.load_files(vec!["security/users.polar"])?;
+    oso.load_files(vec!["security/users.polar", "security/addresses.polar"])?;
 
     Ok(OsoArc {
         oso: Arc::new(Mutex::new(oso)),
@@ -61,4 +61,141 @@ pub fn init() -> OsoArc {
         eprintln! { "Error loading oso policies:\n{}", e };
         std::process::exit(1);
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::db::models::{Address, AuthUser, User};
+    use once_cell::sync::Lazy;
+
+    static OSO: Lazy<OsoArc> = Lazy::new(init);
+
+    #[test]
+    fn test_user_read_self() {
+        assert_eq!(
+            true,
+            OSO.is_allowed(AuthUser::dummy(1), OsoAction::Read, User::dummy(1))
+        );
+    }
+
+    #[test]
+    fn test_user_read_other_user() {
+        assert_eq!(
+            false,
+            OSO.is_allowed(AuthUser::dummy(1), OsoAction::Read, User::dummy(2))
+        );
+    }
+
+    #[test]
+    fn test_admin_user_read_self() {
+        assert_eq!(
+            true,
+            OSO.is_allowed(AuthUser::dummy_admin(1), OsoAction::Read, User::dummy(1))
+        );
+    }
+
+    #[test]
+    fn test_admin_user_read_other_user() {
+        assert_eq!(
+            true,
+            OSO.is_allowed(AuthUser::dummy_admin(1), OsoAction::Read, User::dummy(2))
+        );
+    }
+
+    #[test]
+    fn test_user_read_own_addresses() {
+        assert_eq!(
+            true,
+            OSO.is_allowed(
+                AuthUser::dummy(1),
+                OsoAction::Read,
+                Address::dummy_for_user(1)
+            )
+        );
+    }
+
+    #[test]
+    fn test_user_read_other_addresses() {
+        assert_eq!(
+            false,
+            OSO.is_allowed(
+                AuthUser::dummy(1),
+                OsoAction::Read,
+                Address::dummy_for_user(2)
+            )
+        );
+    }
+
+    #[test]
+    fn test_admin_user_read_own_addresses() {
+        assert_eq!(
+            true,
+            OSO.is_allowed(
+                AuthUser::dummy_admin(1),
+                OsoAction::Read,
+                Address::dummy_for_user(1)
+            )
+        );
+    }
+
+    #[test]
+    fn test_admin_user_read_other_addresses() {
+        assert_eq!(
+            true,
+            OSO.is_allowed(
+                AuthUser::dummy_admin(1),
+                OsoAction::Create,
+                Address::dummy_for_user(2)
+            )
+        );
+    }
+
+    #[test]
+    fn test_user_create_own_addresses() {
+        assert_eq!(
+            true,
+            OSO.is_allowed(
+                AuthUser::dummy(1),
+                OsoAction::Create,
+                Address::dummy_for_user(1)
+            )
+        );
+    }
+
+    #[test]
+    fn test_user_create_other_addresses() {
+        assert_eq!(
+            false,
+            OSO.is_allowed(
+                AuthUser::dummy(1),
+                OsoAction::Create,
+                Address::dummy_for_user(2)
+            )
+        );
+    }
+
+    #[test]
+    fn test_admin_user_create_own_addresses() {
+        assert_eq!(
+            true,
+            OSO.is_allowed(
+                AuthUser::dummy_admin(1),
+                OsoAction::Create,
+                Address::dummy_for_user(1)
+            )
+        );
+    }
+
+    #[test]
+    fn test_admin_user_create_other_addresses() {
+        assert_eq!(
+            true,
+            OSO.is_allowed(
+                AuthUser::dummy_admin(1),
+                OsoAction::Create,
+                Address::dummy_for_user(2)
+            )
+        );
+    }
 }

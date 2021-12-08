@@ -14,13 +14,15 @@ async fn create_offer(
     db: Db,
     new_offer: Json<NewFlightOffer>,
 ) -> ApiResult<Json<FlightOffer>> {
+    new_offer.is_valid()?;
+
     FlightOffer::save(&db, new_offer.clone())
         .await
-        .map_err(|_e| error(Status::InternalServerError, ""))?;
+        .map_err(|e| error(e, Status::InternalServerError, ""))?;
 
     FlightOffer::last_inserted(&db)
         .await
-        .ok_or(error(Status::InternalServerError, ""))
+        .ok_or_else(|| error("", Status::InternalServerError, ""))
 }
 
 #[openapi(tag = "Flights")]
@@ -43,9 +45,26 @@ async fn create_flights(
     id: i32,
     new_flights: Json<Vec<NewFlight>>,
 ) -> ApiResult<()> {
+    let mut prev_time = 0;
+    for flight in new_flights.clone().into_iter() {
+        if flight.departure_time.clone().timestamp() > prev_time {
+            prev_time = flight.arrival_time.clone().timestamp();
+        } else {
+            return Err(error(
+                "Invalid array of flights",
+                Status::BadRequest,
+                "Departure of a flight must succeed arrival of previous flight",
+            ));
+        }
+        flight.is_valid()?;
+    }
+
     FlightOffer::save_flights(&db, id, new_flights)
         .await
-        .map_or(Err(error(Status::InternalServerError, "")), |_res| Ok(()))
+        .map_or_else(
+            |e| Err(error(e, Status::InternalServerError, "")),
+            |_res| Ok(()),
+        )
 }
 
 pub fn get_routes_and_docs(settings: &OpenApiSettings) -> (Vec<rocket::Route>, OpenApi) {

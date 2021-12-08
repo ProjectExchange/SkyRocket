@@ -4,7 +4,7 @@ use crate::db::models::UserRole;
 use crate::db::{schema::users, Db};
 use crate::routes::{error, ApiResult};
 use crate::session;
-use chrono::NaiveDate;
+use chrono::{NaiveDate, Utc};
 use diesel::prelude::*;
 use diesel_derive_enum::DbEnum;
 use oso::{Oso, PolarClass};
@@ -17,7 +17,7 @@ use rocket_okapi::gen::OpenApiGenerator;
 use rocket_okapi::okapi::schemars;
 use rocket_okapi::okapi::schemars::JsonSchema;
 use rocket_okapi::request::{OpenApiFromRequest, RequestHeaderInput};
-use validator::Validate;
+use validator::{Validate, ValidationError};
 
 #[derive(Debug, Clone, Deserialize, Serialize, DbEnum, JsonSchema)]
 #[serde(crate = "rocket::serde")]
@@ -35,14 +35,28 @@ pub struct NewUser {
     pub lastname: String,
     #[validate(email)]
     pub email: String,
+    #[validate(custom = "is_adult")]
     pub birthday: NaiveDate,
     pub gender: Gender,
+}
+
+/// custom validator function to check that a given user is older than 18 years
+fn is_adult(birthday: &NaiveDate) -> Result<(), ValidationError> {
+    let age_in_days = Utc::now()
+        .naive_utc()
+        .signed_duration_since(birthday.and_hms(0, 0, 0))
+        .num_days();
+    if age_in_days / 365 > 18 {
+        Ok(())
+    } else {
+        Err(ValidationError::new("User must be older than 18 years"))
+    }
 }
 
 impl NewUser {
     pub fn is_valid(&self) -> ApiResult<()> {
         self.validate()
-            .map_err(|e| error(Status::BadRequest, &e.to_string()))
+            .map_err(|e| error(e.clone(), Status::BadRequest, &e.to_string()))
     }
 
     pub async fn save(db: &Db, user: NewUser) -> Option<usize> {
@@ -156,6 +170,16 @@ pub struct AuthUser {
 }
 
 impl AuthUser {
+    /// Creates a dummy AuthUser without admin role, required for oso unit tests
+    pub fn dummy(id: i32) -> Self {
+        AuthUser::new(Json(User::dummy(id)), Vec::new())
+    }
+
+    /// Creates a dummy AuthUser without admin role, required for oso unit tests
+    pub fn dummy_admin(id: i32) -> Self {
+        AuthUser::new(Json(User::dummy(id)), vec![Role::Admin])
+    }
+
     pub async fn by_user_id(db: &Db, id: i32) -> Option<Self> {
         let user = User::find_by_id(db, id).await?;
         let roles = UserRole::all_from_user(db, user.clone()).await;
@@ -176,7 +200,7 @@ impl AuthUser {
             firstname: user.firstname.clone(),
             lastname: user.lastname.clone(),
             email: user.email.clone(),
-            birthday: user.birthday.clone(),
+            birthday: user.birthday,
             gender: user.gender.clone(),
             roles,
         }

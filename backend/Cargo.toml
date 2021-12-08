@@ -14,6 +14,7 @@ async-session = "3.0.0"
 async-redis-session = "0.2.2"
 oso = "0.24.0"
 oso-derive = "0.24.0"
+regex = "1.5.4"
 
 [dependencies.reqwest]
 version = "0.11"

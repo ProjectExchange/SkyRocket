@@ -1,13 +1,18 @@
 use crate::db::models::DbResult;
 use crate::db::Db;
 use crate::db::{schema::flights, schema::flights_offers};
+use crate::routes::{error, ApiResult};
 use chrono::NaiveDateTime;
 use diesel::prelude::*;
 use diesel_derive_enum::DbEnum;
+use once_cell::sync::Lazy;
+use regex::Regex;
+use rocket::http::Status;
 use rocket::serde::json::Json;
 use rocket::serde::{Deserialize, Serialize};
 use rocket_okapi::okapi::schemars;
 use rocket_okapi::okapi::schemars::JsonSchema;
+use validator::{Validate, ValidationError};
 
 #[derive(Debug, Clone, Deserialize, Serialize, DbEnum, JsonSchema)]
 #[serde(crate = "rocket::serde")]
@@ -16,24 +21,52 @@ pub enum Currency {
     Euro,
 }
 
-#[derive(Debug, Clone, Deserialize, Serialize, JsonSchema)]
+/// Regex to validate the ICAO of a given flight
+static RE_ICAO: Lazy<Regex> = Lazy::new(|| Regex::new(r"[A-Z]{4}$").unwrap());
+
+#[derive(Debug, Clone, Deserialize, Serialize, JsonSchema, Validate)]
 #[serde(crate = "rocket::serde")]
+#[validate(schema(function = "arrival_greater_departure"))]
 pub struct NewFlight {
-    departure_icao: String,
-    departure_time: NaiveDateTime,
-    arrival_icao: String,
-    arrival_time: NaiveDateTime,
+    #[validate(regex = "RE_ICAO")]
+    #[serde(rename = "departureIcao")]
+    pub departure_icao: String,
+    #[serde(rename = "departureTime")]
+    pub departure_time: NaiveDateTime,
+    #[validate(regex = "RE_ICAO")]
+    #[serde(rename = "arrivalIcao")]
+    pub arrival_icao: String,
+    #[serde(rename = "arrivalTime")]
+    pub arrival_time: NaiveDateTime,
+}
+
+impl NewFlight {
+    pub fn is_valid(&self) -> ApiResult<()> {
+        self.validate()
+            .map_err(|e| error(e.clone(), Status::BadRequest, &e.to_string()))
+    }
+}
+
+/// Custom validator function to make sure arrival succeeds departure
+fn arrival_greater_departure(flight: &NewFlight) -> Result<(), ValidationError> {
+    if flight.departure_time.timestamp() < flight.arrival_time.timestamp() {
+        Ok(())
+    } else {
+        Err(ValidationError::new(
+            "Invalid flights: Arrival happens before departure",
+        ))
+    }
 }
 
 #[derive(Debug, Clone, Insertable, AsChangeset, Deserialize, Serialize)]
 #[serde(crate = "rocket::serde")]
 #[table_name = "flights"]
 pub struct InsertableFlight {
-    offer_id: i32,
-    departure_icao: String,
-    departure_time: NaiveDateTime,
-    arrival_icao: String,
-    arrival_time: NaiveDateTime,
+    pub offer_id: i32,
+    pub departure_icao: String,
+    pub departure_time: NaiveDateTime,
+    pub arrival_icao: String,
+    pub arrival_time: NaiveDateTime,
 }
 
 impl InsertableFlight {
@@ -56,28 +89,42 @@ impl InsertableFlight {
 #[table_name = "flights"]
 pub struct Flight {
     id: i32,
+    #[serde(rename = "offerId")]
     offer_id: i32,
-    departure_icao: String,
-    departure_time: NaiveDateTime,
-    arrival_icao: String,
-    arrival_time: NaiveDateTime,
+    #[serde(rename = "departureIcao")]
+    pub departure_icao: String,
+    #[serde(rename = "departureTime")]
+    pub departure_time: NaiveDateTime,
+    #[serde(rename = "arrivalIcao")]
+    pub arrival_icao: String,
+    #[serde(rename = "arrivalTime")]
+    pub arrival_time: NaiveDateTime,
 }
 
 impl Flight {
     pub async fn all_from_offer(db: &Db, offer_id: i32) -> Vec<Flight> {
         db.run(move |conn| Flight::belonging_to(&FlightOffer::dummy(offer_id)).load(conn))
             .await
-            .unwrap_or(Vec::new())
+            .unwrap_or_else(|_| Vec::new())
     }
 }
 
-#[derive(Debug, Clone, Insertable, Deserialize, Serialize, JsonSchema)]
+#[derive(Debug, Clone, Insertable, Deserialize, Serialize, JsonSchema, Validate)]
 #[serde(crate = "rocket::serde")]
 #[table_name = "flights_offers"]
 pub struct NewFlightOffer {
+    #[validate(range(min = 1, max = 2000))]
     seats: i32,
+    #[validate(range(min = 1, max = 99999))]
     price: f32,
     currency: Currency,
+}
+
+impl NewFlightOffer {
+    pub fn is_valid(&self) -> ApiResult<()> {
+        self.validate()
+            .map_err(|e| error(e.clone(), Status::BadRequest, &e.to_string()))
+    }
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize, Identifiable, Queryable, JsonSchema)]
@@ -103,7 +150,7 @@ impl FlightOffer {
     pub async fn get_all(db: &Db) -> Vec<FlightOffer> {
         db.run(move |conn| flights_offers::table.load(conn))
             .await
-            .unwrap_or(Vec::new())
+            .unwrap_or_else(|_| Vec::new())
     }
 
     pub async fn save(db: &Db, new_offer: NewFlightOffer) -> DbResult {

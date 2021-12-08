@@ -23,7 +23,11 @@ pub type ApiError = status::Custom<Json<ErrorBody>>;
 
 pub type ApiResult<T> = std::result::Result<T, ApiError>;
 
-pub fn error(status: Status, message: &str) -> ApiError {
+pub fn error<Error>(err: Error, status: Status, message: &str) -> ApiError
+where
+    Error: ToString,
+{
+    eprintln! { "{}", err.to_string() };
     status::Custom(
         status,
         Json(ErrorBody {
@@ -65,7 +69,7 @@ pub fn init() -> Rocket<Build> {
     mount_endpoints_and_merged_docs! {
         rocket, "/v1".to_owned(), openapi_settings,
         "/users" => users::get_routes_and_docs(&openapi_settings),
-        "/addresses" => addresses::get_routes_and_docs(&openapi_settings),
+        "/users" => addresses::get_routes_and_docs(&openapi_settings),
         "/offers" => offers::get_routes_and_docs(&openapi_settings),
         "/users/login" => login::get_routes_and_docs(&openapi_settings),
     };
