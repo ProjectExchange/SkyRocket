@@ -31,9 +31,18 @@ jobs:
       - name: Install clippy
         run: rustup component add clippy
 
-      # Generate clippy report for SonarQube analysis
-      - name: Generate clippy report
-        run: cd backend/ && cargo clippy --message-format=json &> clippy.report
+      # Install tarpaulin for test coverage reports
+      - name: Install tarpaulin
+        run: cargo install tarpaulin
+
+      - name: Generate sonar report files
+        run: |
+          cd backend/
+          # Generate clippy report for SonarQube analysis
+          cargo clippy --message-format=json &> clippy.report
+          # Generate coverage report
+          cargo tarpaulin --out Lcov
+          sed -i s#SF:.*/backend#SF:backend#g backend/lcov.info
 
       - name: Build @skyrocket/ng-api-client
         run: cd lib/ng-api-client && npm ci && npm run build
