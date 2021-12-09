@@ -12,7 +12,13 @@
 
 export interface NewFlight { 
     departureIcao: string;
-    departureTime: string;
+    /**
+     * Must be formatted like `2015-07-01 08:59:60 +0000`
+     */
+    departureTime: Date;
     arrivalIcao: string;
-    arrivalTime: string;
+    /**
+     * Must be formatted like `2015-07-01 08:59:60 +0000`
+     */
+    arrivalTime: Date;
 }
