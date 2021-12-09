@@ -1,6 +1,3 @@
-use rocket_okapi::request::RequestHeaderInput;
-use rocket_okapi::request::OpenApiFromRequest;
-use rocket_okapi::gen::OpenApiGenerator;
 use rocket::http::Status;
 use rocket::request::{FromRequest, Outcome};
 use rocket::response::status;
@@ -8,9 +5,12 @@ use rocket::serde::json::Json;
 use rocket::serde::{Deserialize, Serialize};
 use rocket::Request;
 use rocket::{Build, Rocket};
+use rocket_okapi::gen::OpenApiGenerator;
 use rocket_okapi::mount_endpoints_and_merged_docs;
 use rocket_okapi::okapi::schemars;
 use rocket_okapi::okapi::schemars::JsonSchema;
+use rocket_okapi::request::OpenApiFromRequest;
+use rocket_okapi::request::RequestHeaderInput;
 
 mod addresses;
 mod docs;
