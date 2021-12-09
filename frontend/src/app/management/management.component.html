@@ -1,0 +1,181 @@
+<div class="bg-img"></div>
+<div class="content">
+  <div class="content-profile">
+    <h1>Management</h1>
+    <div class="content-use-width"></div>
+    <div class="content-profile-addresses">
+      <h2>Overview</h2>
+      <p>Welcome to the <strong>SkyRocket</strong> management interface!</p>
+
+      <!-- Flight Offers -->
+      <h2 class="mt-2">Add New Flight Offer</h2>
+      <form
+        [formGroup]="managementFlightOfferForm"
+        (ngSubmit)="onSubmitFlightOffer()"
+      >
+        <mat-form-field class="content-profile-input" appearance="fill">
+          <mat-label>Seats</mat-label>
+          <input matInput formControlName="seats" type="number" required />
+        </mat-form-field>
+
+        <br />
+
+        <mat-form-field class="content-profile-input" appearance="fill">
+          <mat-label>Price</mat-label>
+          <input matInput formControlName="price" type="number" required />
+        </mat-form-field>
+
+        <br />
+
+        <div class="form-field-group">
+          <mat-form-field appearance="fill">
+            <mat-label>Currency</mat-label>
+            <mat-select name="currency" formControlName="currency">
+              <mat-option
+                *ngFor="let currency of currencies"
+                [value]="currency"
+              >
+                {{ currency }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <button mat-flat-button color="primary" class="add-address-btn">
+          Add flight offer
+        </button>
+      </form>
+
+      <h2 class="mt-2">All Flight Offers</h2>
+      <table
+        mat-table
+        [dataSource]="dataSourceFlightOffer"
+        aria-label="flight offers"
+      >
+        <!-- Id Column -->
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef scope="col">ID</th>
+          <td mat-cell *matCellDef="let element">{{ element.id }}</td>
+        </ng-container>
+
+        <!-- Seats Column -->
+        <ng-container matColumnDef="seats">
+          <th mat-header-cell *matHeaderCellDef scope="col">Seats</th>
+          <td mat-cell *matCellDef="let element">{{ element.seats }}</td>
+        </ng-container>
+
+        <!-- Price Column -->
+        <ng-container matColumnDef="price">
+          <th mat-header-cell *matHeaderCellDef scope="col">Price</th>
+          <td mat-cell *matCellDef="let element">{{ element.price }}</td>
+        </ng-container>
+
+        <!-- Currency Column -->
+        <ng-container matColumnDef="currency">
+          <th mat-header-cell *matHeaderCellDef scope="col">Currency</th>
+          <td mat-cell *matCellDef="let element">{{ element.currency }}</td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumnsFlightOffer"></tr>
+        <tr
+          mat-row
+          *matRowDef="let row; columns: displayedColumnsFlightOffer"
+        ></tr>
+      </table>
+
+      <!-- Flights -->
+      <h2 class="mt-2">Add New Flight</h2>
+      <form [formGroup]="managementFlightForm" (ngSubmit)="onSubmitFlight()">
+        <div class="form-field-group">
+          <mat-form-field appearance="fill">
+            <mat-label>Flight Offer</mat-label>
+            <mat-select name="idFlightOffer" formControlName="idFlightOffer">
+              <mat-option
+                *ngFor="let fligthOffer of flightOffers"
+                [value]="fligthOffer.value"
+              >
+                {{ fligthOffer.viewValue }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <mat-form-field class="content-profile-input" appearance="fill">
+          <mat-label>Departure ICAO</mat-label>
+          <input matInput formControlName="departureIcao" required />
+        </mat-form-field>
+
+        <mat-form-field class="content-profile-input" appearance="fill">
+          <mat-label>Departure Time</mat-label>
+          <input
+            matInput
+            type="datetime-local"
+            formControlName="departureTime"
+          />
+        </mat-form-field>
+
+        <br />
+
+        <mat-form-field class="content-profile-input" appearance="fill">
+          <mat-label>Arrival ICAO</mat-label>
+          <input matInput formControlName="arrivalIcao" required />
+        </mat-form-field>
+
+        <mat-form-field class="content-profile-input" appearance="fill">
+          <mat-label>Arrival Time</mat-label>
+          <input
+            matInput
+            type="datetime-local"
+            formControlName="arrivalTime"
+          />
+        </mat-form-field>
+
+        <button mat-flat-button color="primary" class="add-address-btn">
+          Add flight
+        </button>
+      </form>
+
+      <h2 class="mt-2">All Flights</h2>
+      <table mat-table [dataSource]="dataSourceFlight" aria-label="flights">
+        <!-- Offer ID -->
+        <ng-container matColumnDef="offerId">
+          <th mat-header-cell *matHeaderCellDef scope="col">Offer ID</th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.offerId }}
+          </td>
+        </ng-container>
+        
+        <!-- Departure ICAO Column -->
+        <ng-container matColumnDef="departureIcao">
+          <th mat-header-cell *matHeaderCellDef scope="col">Departure ICAO</th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.departureIcao }}
+          </td>
+        </ng-container>
+
+        <!-- Departure Time Column -->
+        <ng-container matColumnDef="departureTime">
+          <th mat-header-cell *matHeaderCellDef scope="col">Departure Time</th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.departureTime }}
+          </td>
+        </ng-container>
+
+        <!-- Arrival ICAO Column -->
+        <ng-container matColumnDef="arrivalIcao">
+          <th mat-header-cell *matHeaderCellDef scope="col">Arrival ICAO</th>
+          <td mat-cell *matCellDef="let element">{{ element.arrivalIcao }}</td>
+        </ng-container>
+
+        <!-- Arrival Time Column -->
+        <ng-container matColumnDef="arrivalTime">
+          <th mat-header-cell *matHeaderCellDef scope="col">Arrival Time</th>
+          <td mat-cell *matCellDef="let element">{{ element.arrivalTime }}</td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumnsFlight"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumnsFlight"></tr>
+      </table>
+    </div>
+  </div>
+</div>

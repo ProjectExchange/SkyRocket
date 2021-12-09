@@ -33,6 +33,7 @@ import { ProfileComponent } from './profile/profile.component';
 import { appInitializer } from './_services/app.initializer';
 import { AuthService } from './_services/auth.service';
 import { LogoutComponent } from './logout/logout.component';
+import { ManagementComponent } from './management/management.component';
 
 @NgModule({
   declarations: [
@@ -44,6 +45,7 @@ import { LogoutComponent } from './logout/logout.component';
     OauthComponent,
     ProfileComponent,
     LogoutComponent,
+    ManagementComponent,
   ],
   imports: [
     ApiModule,
