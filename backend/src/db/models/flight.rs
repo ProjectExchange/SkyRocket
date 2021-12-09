@@ -2,7 +2,7 @@ use crate::db::models::DbResult;
 use crate::db::Db;
 use crate::db::{schema::flights, schema::flights_offers};
 use crate::routes::{error, ApiResult};
-use chrono::NaiveDateTime;
+use chrono::{DateTime, NaiveDateTime, Utc};
 use diesel::prelude::*;
 use diesel_derive_enum::DbEnum;
 use once_cell::sync::Lazy;
@@ -26,18 +26,17 @@ static RE_ICAO: Lazy<Regex> = Lazy::new(|| Regex::new(r"[A-Z]{4}$").unwrap());
 
 #[derive(Debug, Clone, Deserialize, Serialize, JsonSchema, Validate)]
 #[serde(crate = "rocket::serde")]
+#[serde(rename_all = "camelCase")]
 #[validate(schema(function = "arrival_greater_departure"))]
 pub struct NewFlight {
     #[validate(regex = "RE_ICAO")]
-    #[serde(rename = "departureIcao")]
     pub departure_icao: String,
-    #[serde(rename = "departureTime")]
-    pub departure_time: NaiveDateTime,
+    /// Must be formatted like `2015-07-01 08:59:60 +0000`
+    pub departure_time: DateTime<Utc>,
     #[validate(regex = "RE_ICAO")]
-    #[serde(rename = "arrivalIcao")]
     pub arrival_icao: String,
-    #[serde(rename = "arrivalTime")]
-    pub arrival_time: NaiveDateTime,
+    /// Must be formatted like `2015-07-01 08:59:60 +0000`
+    pub arrival_time: DateTime<Utc>,
 }
 
 impl NewFlight {
@@ -74,9 +73,9 @@ impl InsertableFlight {
         InsertableFlight {
             offer_id,
             departure_icao: new_flight.departure_icao.clone(),
-            departure_time: new_flight.departure_time,
+            departure_time: new_flight.departure_time.naive_utc(),
             arrival_icao: new_flight.arrival_icao.clone(),
-            arrival_time: new_flight.arrival_time,
+            arrival_time: new_flight.arrival_time.naive_utc(),
         }
     }
 }
