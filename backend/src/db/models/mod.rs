@@ -6,7 +6,10 @@ mod session;
 mod user;
 
 pub use address::{Address, NewAddress};
-pub use flight::{Currency, CurrencyMapping, Flight, FlightOffer, NewFlight, NewFlightOffer};
+pub use flight::{
+    Currency, CurrencyMapping, Flight, FlightOffer, FlightOfferWithCapacity, NewFlight,
+    NewFlightOffer,
+};
 pub use github_oauth_user::{GitHubOAuthUser, GithubOAuthRegistrar};
 pub use role::{AdminRole, Role, RoleMapping, UserRole};
 pub use session::{NewSession, Session};

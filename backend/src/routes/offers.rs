@@ -1,4 +1,6 @@
-use crate::db::models::{AdminRole, AuthUser, Flight, FlightOffer, NewFlight, NewFlightOffer};
+use crate::db::models::{
+    AdminRole, AuthUser, Flight, FlightOffer, FlightOfferWithCapacity, NewFlight, NewFlightOffer,
+};
 use crate::db::Db;
 use crate::routes::{error, ApiResult};
 use rocket::http::Status;
@@ -27,8 +29,8 @@ async fn create_offer(
 
 #[openapi(tag = "Flights")]
 #[get("/")]
-async fn read_offer(_actor: AuthUser, db: Db) -> ApiResult<Json<Vec<FlightOffer>>> {
-    Ok(Json(FlightOffer::get_all(&db).await))
+async fn read_offer(_actor: AuthUser, db: Db) -> ApiResult<Json<Vec<FlightOfferWithCapacity>>> {
+    Ok(Json(FlightOfferWithCapacity::get_all(&db).await))
 }
 
 #[openapi(tag = "Flights")]
