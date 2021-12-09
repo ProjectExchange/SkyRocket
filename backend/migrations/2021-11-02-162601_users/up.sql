@@ -64,10 +64,11 @@ CREATE TABLE `bookings`(
 );
 
 CREATE TABLE `sessions`(
+    `id` INT(255) NOT NULL AUTO_INCREMENT,
     `user_id` INT(255) NOT NULL,
     `redis_key` VARCHAR(255) NOT NULL,
     `established` DATETIME NOT NULL,
     `data` VARCHAR(255) NOT NULL,
-    PRIMARY KEY (`redis_key`),
+    PRIMARY KEY (`id`),
     FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
 );

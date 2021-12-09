@@ -12,4 +12,5 @@ export * from './newFlightOffer';
 export * from './newUser';
 export * from './oAuthProviders';
 export * from './role';
+export * from './session';
 export * from './user';

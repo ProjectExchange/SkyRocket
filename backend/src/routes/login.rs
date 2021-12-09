@@ -1,7 +1,9 @@
 use super::{error, ApiResult};
 use super::{GitHubAccessTokenRequest, GitHubAccessTokenResponse, OAuthProviders};
+use crate::db::models::Session;
 use crate::db::models::{AuthUser, Gender, GitHubOAuthUser, NewUser};
 use crate::db::Db;
+use crate::routes::UserAgent;
 use crate::session;
 use crate::{http, CONFIG};
 use chrono::NaiveDate;
@@ -88,6 +90,7 @@ async fn login_github(
     db: Db,
     code: String,
     cookies: &CookieJar<'_>,
+    ua: UserAgent,
 ) -> ApiResult<RegistratedOrNewUser> {
     // validate token received from GitHub
     let oauth_res = http::post::<GitHubAccessTokenResponse, GitHubAccessTokenRequest>(
@@ -122,7 +125,15 @@ async fn login_github(
         let user = AuthUser::by_user_id(&db, github_user.user_id)
             .await
             .ok_or_else(|| error("", Status::InternalServerError, ""))?;
-        session::set_user(cookies, user.clone()).await;
+        Session::save(&db, cookies, ua, user.clone())
+            .await
+            .map_err(|e| {
+                error(
+                    e,
+                    Status::InternalServerError,
+                    "Error saving session, please try again later",
+                )
+            })?;
         Ok(RegistratedOrNewUser::Registrated(Json(user)))
     } else {
         session::set_github_id(cookies, github_id).await;
