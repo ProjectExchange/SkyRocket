@@ -43,7 +43,7 @@ table! {
 table! {
     use diesel::sql_types::{BigInt, Float, Integer};
     use crate::db::models::CurrencyMapping;
-    flights_offers_with_capacity (id) {
+    flights_offers_with_occupancy (id) {
         id -> Integer,
         seats -> Integer,
         occupied -> BigInt,

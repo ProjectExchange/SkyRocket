@@ -1,5 +1,6 @@
 use crate::db::models::{
-    AdminRole, AuthUser, Flight, FlightOffer, FlightOfferWithCapacity, NewFlight, NewFlightOffer,
+    AdminRole, AuthUser, Booking, Flight, FlightOffer, FlightOfferWithOccupancy, NewFlight,
+    NewFlightOffer,
 };
 use crate::db::Db;
 use crate::routes::{error, ApiResult};
@@ -29,8 +30,14 @@ async fn create_offer(
 
 #[openapi(tag = "Flights")]
 #[get("/")]
-async fn read_offer(_actor: AuthUser, db: Db) -> ApiResult<Json<Vec<FlightOfferWithCapacity>>> {
-    Ok(Json(FlightOfferWithCapacity::get_all(&db).await))
+async fn read_offer(_actor: AuthUser, db: Db) -> ApiResult<Json<Vec<FlightOfferWithOccupancy>>> {
+    Ok(Json(FlightOfferWithOccupancy::get_all(&db).await))
+}
+
+#[openapi(tag = "Flights")]
+#[post("/<id>/book?<seats>")]
+async fn book_offer(actor: AuthUser, db: Db, id: i32, seats: i32) -> ApiResult<()> {
+    Booking::create(&db, actor.id, id, seats).await
 }
 
 #[openapi(tag = "Flights")]
@@ -73,6 +80,7 @@ pub fn get_routes_and_docs(settings: &OpenApiSettings) -> (Vec<rocket::Route>, O
     openapi_get_routes_spec![
         settings: create_offer,
         read_offer,
+        book_offer,
         create_flights,
         read_flights
     ]

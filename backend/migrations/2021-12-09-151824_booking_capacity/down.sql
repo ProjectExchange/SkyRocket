@@ -1,1 +1,1 @@
-DROP VIEW `flights_offers_with_capacity`;
+DROP VIEW `flights_offers_with_occupancy`;

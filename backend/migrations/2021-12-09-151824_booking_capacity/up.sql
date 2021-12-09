@@ -1,4 +1,4 @@
-CREATE VIEW flights_offers_with_capacity AS
+CREATE VIEW flights_offers_with_occupancy AS
 SELECT
     flights_offers.*, SUM(bookings.seats) as occupied
 FROM

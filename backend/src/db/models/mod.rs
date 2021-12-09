@@ -1,4 +1,5 @@
 mod address;
+mod booking;
 mod flight;
 mod github_oauth_user;
 mod role;
@@ -6,8 +7,9 @@ mod session;
 mod user;
 
 pub use address::{Address, NewAddress};
+pub use booking::Booking;
 pub use flight::{
-    Currency, CurrencyMapping, Flight, FlightOffer, FlightOfferWithCapacity, NewFlight,
+    Currency, CurrencyMapping, Flight, FlightOffer, FlightOfferWithOccupancy, NewFlight,
     NewFlightOffer,
 };
 pub use github_oauth_user::{GitHubOAuthUser, GithubOAuthRegistrar};

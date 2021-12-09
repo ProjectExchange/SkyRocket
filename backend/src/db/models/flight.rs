@@ -1,5 +1,5 @@
 use crate::db::models::DbResult;
-use crate::db::schema::{bookings, flights, flights_offers, flights_offers_with_capacity};
+use crate::db::schema::{bookings, flights, flights_offers, flights_offers_with_occupancy};
 use crate::db::Db;
 use crate::routes::{error, ApiResult};
 use chrono::{DateTime, NaiveDateTime, Utc};
@@ -138,20 +138,30 @@ pub struct FlightOffer {
 
 #[derive(Debug, Clone, Deserialize, Serialize, Identifiable, Queryable, JsonSchema)]
 #[serde(crate = "rocket::serde")]
-#[table_name = "flights_offers_with_capacity"]
-pub struct FlightOfferWithCapacity {
-    id: i32,
-    seats: i32,
-    occupied: i64,
-    price: f32,
-    currency: Currency,
+#[table_name = "flights_offers_with_occupancy"]
+pub struct FlightOfferWithOccupancy {
+    pub id: i32,
+    pub seats: i32,
+    pub occupied: i64,
+    pub price: f32,
+    pub currency: Currency,
 }
 
-impl FlightOfferWithCapacity {
-    pub async fn get_all(db: &Db) -> Vec<FlightOfferWithCapacity> {
-        db.run(move |conn| flights_offers_with_capacity::table.load(conn))
+impl FlightOfferWithOccupancy {
+    pub async fn get_all(db: &Db) -> Vec<FlightOfferWithOccupancy> {
+        db.run(move |conn| flights_offers_with_occupancy::table.load(conn))
             .await
             .unwrap_or_else(|_| Vec::new())
+    }
+
+    pub async fn from_offer_id(db: &Db, offer_id: i32) -> Option<FlightOfferWithOccupancy> {
+        db.run(move |conn| {
+            flights_offers_with_occupancy::table
+                .find(offer_id)
+                .first(conn)
+        })
+        .await
+        .ok()
     }
 }
 
