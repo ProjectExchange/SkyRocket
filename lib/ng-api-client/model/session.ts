@@ -10,9 +10,9 @@
  * Do not edit the class manually.
  */
 
-export interface NewFlight { 
-    departureIcao: string;
-    departureTime: string;
-    arrivalIcao: string;
-    arrivalTime: string;
+export interface Session { 
+    id: number;
+    userId: number;
+    established: string;
+    data: string;
 }
