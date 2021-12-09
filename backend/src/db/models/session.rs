@@ -31,7 +31,6 @@ pub struct Session {
     pub id: i32,
     #[polar(attribute)]
     pub user_id: i32,
-    pub redis_key: String,
     pub established: NaiveDateTime,
     pub data: String,
 }
@@ -43,22 +42,35 @@ impl Session {
         Session {
             id: 0,
             user_id,
-            redis_key: String::new(),
             established: NaiveDateTime::from_timestamp(0, 0),
             data: String::new(),
         }
     }
 
     pub async fn all_from_user(db: &Db, user_id: i32) -> Vec<Self> {
-        db.run(move |conn| Session::belonging_to(&User::dummy(user_id)).load(conn))
-            .await
-            .unwrap_or_else(|_| Vec::new())
+        db.run(move |conn| {
+            Session::belonging_to(&User::dummy(user_id))
+                .select((
+                    sessions::id,
+                    sessions::user_id,
+                    sessions::established,
+                    sessions::data,
+                ))
+                .load(conn)
+        })
+        .await
+        .unwrap_or_else(|_| Vec::new())
     }
 
-    pub async fn get_redis_key_by_id(db: &Db, session_id: i32) -> Option<Session> {
-        db.run(move |conn| sessions::table.find(session_id).first(conn))
-            .await
-            .ok()
+    pub async fn get_redis_key_by_id(db: &Db, session_id: i32) -> Option<String> {
+        db.run(move |conn| {
+            sessions::table
+                .select(sessions::redis_key)
+                .find(session_id)
+                .first(conn)
+        })
+        .await
+        .ok()
     }
 
     async fn delete_by_redis_key(db: &Db, redis_key: String) -> ApiResult<()> {
@@ -75,15 +87,15 @@ impl Session {
     }
 
     pub async fn delete_by_id(db: &Db, session_id: i32) -> ApiResult<()> {
-        let db_session = Session::get_redis_key_by_id(db, session_id)
+        let redis_key = Session::get_redis_key_by_id(db, session_id)
             .await
             .ok_or_else(|| error("", Status::NotFound, "Session not found"))?;
 
-        browser_session::revoke_by_key(db_session.redis_key.clone())
+        browser_session::revoke_by_key(redis_key.clone())
             .await
             .ok_or_else(|| error("", Status::NotFound, "Session not found"))?;
 
-        Session::delete_by_redis_key(db, db_session.redis_key).await
+        Session::delete_by_redis_key(db, redis_key).await
     }
 
     pub async fn delete_by_cookie(db: &Db, cookies: &CookieJar<'_>) -> ApiResult<()> {
