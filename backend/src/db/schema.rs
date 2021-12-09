@@ -41,7 +41,8 @@ table! {
 }
 
 table! {
-    sessions (redis_key) {
+    sessions (id) {
+        id -> Integer,
         user_id -> Integer,
         redis_key -> Varchar,
         established -> Datetime,

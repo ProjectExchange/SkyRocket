@@ -1,4 +1,5 @@
 use crate::db::models::AdminRole;
+use crate::db::models::Session;
 use crate::db::models::{AuthUser, GitHubOAuthUser, GithubOAuthRegistrar, NewUser, Role, User};
 use crate::db::Db;
 use crate::oso::{OsoAction, OsoState};
@@ -129,10 +130,8 @@ async fn profile(cookies: &CookieJar<'_>) -> ApiResult<Json<AuthUser>> {
 
 #[openapi(tag = "Login")]
 #[post("/logout")]
-async fn logout(cookies: &CookieJar<'_>) -> ApiResult<()> {
-    session::revoke(cookies)
-        .await
-        .ok_or_else(|| error("", Status::Unauthorized, "No session to revoke"))
+async fn logout(db: Db, cookies: &CookieJar<'_>) -> ApiResult<()> {
+    Session::delete_by_cookie(&db, cookies).await
 }
 
 pub fn get_routes_and_docs(settings: &OpenApiSettings) -> (Vec<rocket::Route>, OpenApi) {
