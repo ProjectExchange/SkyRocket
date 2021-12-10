@@ -35,9 +35,15 @@ async fn read_offer(_actor: AuthUser, db: Db) -> ApiResult<Json<Vec<FlightOfferW
 }
 
 #[openapi(tag = "Flights")]
-#[post("/<id>/book?<seats>")]
-async fn book_offer(actor: AuthUser, db: Db, id: i32, seats: i32) -> ApiResult<()> {
+#[post("/<id>/bookings?<seats>")]
+async fn create_offer_booking(actor: AuthUser, db: Db, id: i32, seats: i32) -> ApiResult<()> {
     Booking::create(&db, actor.id, id, seats).await
+}
+
+#[openapi(tag = "Flights")]
+#[get("/<id>/bookings")]
+async fn read_offer_bookings(_r: AdminRole, db: Db, id: i32) -> ApiResult<Json<Vec<Booking>>> {
+    Ok(Json(Booking::all_from_offer(&db, id).await))
 }
 
 #[openapi(tag = "Flights")]
@@ -80,7 +86,8 @@ pub fn get_routes_and_docs(settings: &OpenApiSettings) -> (Vec<rocket::Route>, O
     openapi_get_routes_spec![
         settings: create_offer,
         read_offer,
-        book_offer,
+        create_offer_booking,
+        read_offer_bookings,
         create_flights,
         read_flights
     ]

@@ -22,5 +22,6 @@ pub(self) type DbResult = Result<usize, diesel::result::Error>;
 pub fn register_polar_classes(oso: &mut oso::Oso) -> oso::Result<()> {
     user::register_polar_classes(oso)?;
     session::register_polar_classes(oso)?;
+    booking::register_polar_classes(oso)?;
     address::register_polar_classes(oso)
 }
