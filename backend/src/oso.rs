@@ -52,6 +52,7 @@ fn init_oso_arc() -> Result<OsoArc> {
     oso.load_files(vec![
         "security/users.polar",
         "security/addresses.polar",
+        "security/bookings.polar",
         "security/sessions.polar",
     ])?;
 

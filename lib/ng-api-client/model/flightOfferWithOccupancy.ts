@@ -9,16 +9,12 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+import { Currency } from './currency';
 
-export interface NewFlight { 
-    departureIcao: string;
-    /**
-     * Must be formatted like `2015-07-01 08:59:60 +0000`
-     */
-    departureTime: Date;
-    arrivalIcao: string;
-    /**
-     * Must be formatted like `2015-07-01 08:59:60 +0000`
-     */
-    arrivalTime: Date;
+export interface FlightOfferWithOccupancy { 
+    id: number;
+    seats: number;
+    occupied: number;
+    price: number;
+    currency: Currency;
 }

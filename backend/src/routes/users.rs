@@ -1,6 +1,7 @@
-use crate::db::models::AdminRole;
-use crate::db::models::Session;
-use crate::db::models::{AuthUser, GitHubOAuthUser, GithubOAuthRegistrar, NewUser, Role, User};
+use crate::db::models::{
+    AdminRole, AuthUser, Booking, GitHubOAuthUser, GithubOAuthRegistrar, NewUser, Role, Session,
+    User,
+};
 use crate::db::Db;
 use crate::oso::{OsoAction, OsoState};
 use crate::routes::{error, ApiResult};
@@ -128,6 +129,21 @@ async fn profile(cookies: &CookieJar<'_>) -> ApiResult<Json<AuthUser>> {
     )
 }
 
+#[openapi(tag = "Users")]
+#[get("/<id>/bookings")]
+async fn read_bookings(
+    actor: AuthUser,
+    oso: &OsoState,
+    db: Db,
+    id: i32,
+) -> ApiResult<Json<Vec<Booking>>> {
+    if oso.is_allowed(actor, OsoAction::Read, Booking::dummy(id)) {
+        Ok(Json(Booking::all_from_user(&db, id).await))
+    } else {
+        Err(error("", Status::Forbidden, "Forbidden"))
+    }
+}
+
 #[openapi(tag = "Login")]
 #[post("/logout")]
 async fn logout(db: Db, cookies: &CookieJar<'_>) -> ApiResult<()> {
@@ -142,6 +158,7 @@ pub fn get_routes_and_docs(settings: &OpenApiSettings) -> (Vec<rocket::Route>, O
         create,
         update,
         delete,
+        read_bookings,
         profile,
         logout
     ]

@@ -1,6 +1,6 @@
 use crate::db::models::DbResult;
+use crate::db::schema::{bookings, flights, flights_offers, flights_offers_with_occupancy};
 use crate::db::Db;
-use crate::db::{schema::flights, schema::flights_offers};
 use crate::routes::{error, ApiResult};
 use chrono::{DateTime, NaiveDateTime, Utc};
 use diesel::prelude::*;
@@ -136,6 +136,35 @@ pub struct FlightOffer {
     currency: Currency,
 }
 
+#[derive(Debug, Clone, Deserialize, Serialize, Identifiable, Queryable, JsonSchema)]
+#[serde(crate = "rocket::serde")]
+#[table_name = "flights_offers_with_occupancy"]
+pub struct FlightOfferWithOccupancy {
+    pub id: i32,
+    pub seats: i32,
+    pub occupied: i64,
+    pub price: f32,
+    pub currency: Currency,
+}
+
+impl FlightOfferWithOccupancy {
+    pub async fn get_all(db: &Db) -> Vec<FlightOfferWithOccupancy> {
+        db.run(move |conn| flights_offers_with_occupancy::table.load(conn))
+            .await
+            .unwrap_or_else(|_| Vec::new())
+    }
+
+    pub async fn from_offer_id(db: &Db, offer_id: i32) -> Option<FlightOfferWithOccupancy> {
+        db.run(move |conn| {
+            flights_offers_with_occupancy::table
+                .find(offer_id)
+                .first(conn)
+        })
+        .await
+        .ok()
+    }
+}
+
 impl FlightOffer {
     pub fn dummy(id: i32) -> Self {
         FlightOffer {
@@ -146,10 +175,18 @@ impl FlightOffer {
         }
     }
 
-    pub async fn get_all(db: &Db) -> Vec<FlightOffer> {
-        db.run(move |conn| flights_offers::table.load(conn))
-            .await
-            .unwrap_or_else(|_| Vec::new())
+    pub async fn booked_seats(db: &Db, id: i32) -> Option<i64> {
+        db.run(move |conn| {
+            flights_offers::table
+                .find(id)
+                .inner_join(bookings::table)
+                .filter(flights_offers::id.eq(bookings::offer_id))
+                .group_by(flights_offers::id)
+                .select(diesel::dsl::sum(bookings::seats))
+                .first::<Option<i64>>(conn)
+        })
+        .await
+        .ok()?
     }
 
     pub async fn save(db: &Db, new_offer: NewFlightOffer) -> DbResult {
