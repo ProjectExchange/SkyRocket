@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AuthUser, NewUser } from '@skyrocket/ng-api-client';
+import { AuthUser, NewUser, Role } from '@skyrocket/ng-api-client';
 
 function isAuthUser(object: NewUser | AuthUser | undefined): object is AuthUser {
   return !!object && 'id' in object;
@@ -35,5 +35,9 @@ export class AuthService {
 
   get isLoggedIn(): boolean {
     return isAuthUser(this.#user);
+  }
+
+  hasRole(role: Role): boolean {
+    return isAuthUser(this.#user) ? this.#user.roles?.indexOf(role) > -1 : false;
   }
 }
