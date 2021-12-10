@@ -1,6 +1,7 @@
 use crate::db::models::DbResult;
 use crate::db::schema::{bookings, flights, flights_offers, flights_offers_with_occupancy};
 use crate::db::Db;
+use crate::routes::OfferFilter;
 use crate::routes::{error, ApiResult};
 use chrono::{DateTime, NaiveDateTime, Utc};
 use diesel::prelude::*;
@@ -85,18 +86,14 @@ impl InsertableFlight {
 )]
 #[serde(crate = "rocket::serde")]
 #[belongs_to(FlightOffer, foreign_key = "offer_id")]
+#[serde(rename_all = "camelCase")]
 #[table_name = "flights"]
 pub struct Flight {
     id: i32,
-    #[serde(rename = "offerId")]
     offer_id: i32,
-    #[serde(rename = "departureIcao")]
     pub departure_icao: String,
-    #[serde(rename = "departureTime")]
     pub departure_time: NaiveDateTime,
-    #[serde(rename = "arrivalIcao")]
     pub arrival_icao: String,
-    #[serde(rename = "arrivalTime")]
     pub arrival_time: NaiveDateTime,
 }
 
@@ -138,6 +135,7 @@ pub struct FlightOffer {
 
 #[derive(Debug, Clone, Deserialize, Serialize, Identifiable, Queryable, JsonSchema)]
 #[serde(crate = "rocket::serde")]
+#[serde(rename_all = "camelCase")]
 #[table_name = "flights_offers_with_occupancy"]
 pub struct FlightOfferWithOccupancy {
     pub id: i32,
@@ -145,13 +143,28 @@ pub struct FlightOfferWithOccupancy {
     pub occupied: i64,
     pub price: f32,
     pub currency: Currency,
+    pub departure_icao: String,
+    pub arrival_icao: String,
 }
 
 impl FlightOfferWithOccupancy {
-    pub async fn get_all(db: &Db) -> Vec<FlightOfferWithOccupancy> {
-        db.run(move |conn| flights_offers_with_occupancy::table.load(conn))
-            .await
-            .unwrap_or_else(|_| Vec::new())
+    pub async fn get_all(db: &Db, filter: OfferFilter) -> Vec<FlightOfferWithOccupancy> {
+        db.run(move |conn| {
+            let mut query = flights_offers_with_occupancy::table.into_boxed();
+
+            if let Some(departure_icao) = filter.departure_icao {
+                query =
+                    query.filter(flights_offers_with_occupancy::departure_icao.eq(departure_icao));
+            }
+
+            if let Some(arrival_icao) = filter.arrival_icao {
+                query = query.filter(flights_offers_with_occupancy::arrival_icao.eq(arrival_icao));
+            }
+
+            query.load(conn)
+        })
+        .await
+        .unwrap_or_else(|_| Vec::new())
     }
 
     pub async fn from_offer_id(db: &Db, offer_id: i32) -> Option<FlightOfferWithOccupancy> {
