@@ -1,62 +1,33 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  Address, AddressesService, FlightOfferWithOccupancy, FlightsService,
+} from '@skyrocket/ng-api-client';
 import { AuthService } from '../_services/auth.service';
 import { BookingService } from '../_services/booking.service';
-
-interface Flight {
-  value: string;
-  viewValue: string;
-}
-
-interface Address {
-  value: string;
-  viewValue: string;
-}
 
 @Component({
   selector: 'app-book',
   templateUrl: './book.component.html',
   styleUrls: ['./book.component.sass'],
 })
-export class BookComponent {
-  departure: string = this.bookingService.departure;
-
-  arrival: string = this.bookingService.arrival;
-
-  dateDeparture: string = this.bookingService.dateDeparture
-    .toString()
-    .split(' ')
-    .slice(1, 4)
-    .join(' ');
-
-  dateArrival: string = this.bookingService.dateArrival
-    .toString()
-    .split(' ')
-    .slice(1, 4)
-    .join(' ');
-
+export class BookComponent implements OnInit {
   bookFormStep1: FormGroup;
 
   bookFormStep2: FormGroup;
 
   bookFormStep3: FormGroup;
 
-  flights: Flight[] = [
-    { value: '0', viewValue: 'Heilbronn → Mannheim 12:00 Uhr' },
-    { value: '1', viewValue: 'Heilbronn → Mannheim 15:00 Uhr' },
-    { value: '2', viewValue: 'Heilbronn → Mannheim 21:42 Uhr' },
-  ];
+  offers: FlightOfferWithOccupancy[] = [];
 
-  addresses: Address[] = [
-    { value: '0', viewValue: '2020 Burwell Heights Road, Galveston, TX 77553' },
-    { value: '1', viewValue: 'Buelowstrasse 92, 56472 Hahn bei Marienberg ' },
-    { value: '2', viewValue: 'Herentalsebaan 299, 1190 Brussel ' },
-  ];
+  addresses: Address[] = [];
 
   constructor(
     private authService: AuthService,
-    private bookingService: BookingService,
+    private flightService: FlightsService,
+    private addressService: AddressesService,
     private bookForm: FormBuilder,
+    public bookingService: BookingService,
   ) {
     this.bookFormStep1 = this.bookForm.group({
       flight: ['', Validators.required],
@@ -70,5 +41,33 @@ export class BookComponent {
     this.bookFormStep3 = this.bookForm.group({
       address: ['', Validators.required],
     });
+  }
+
+  formatDate(date: Date): string {
+    return date.toString()
+      .split(' ')
+      .slice(1, 4)
+      .join(' ');
+  }
+
+  get dateDeparture(): string {
+    return this.formatDate(this.bookingService.dateDeparture);
+  }
+
+  get dateArrival(): string {
+    return this.formatDate(this.bookingService.dateArrival);
+  }
+
+  ngOnInit(): void {
+    this.flightService.readOffer(
+      this.bookingService.departure || undefined,
+      this.bookingService.arrival || undefined,
+    ).subscribe((offers) => {
+      this.offers = offers;
+    });
+
+    this.addressService
+      .read(this.authService.id)
+      .subscribe((addresses) => { this.addresses = addresses; });
   }
 }

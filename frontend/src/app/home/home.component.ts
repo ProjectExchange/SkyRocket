@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { FlightOfferWithOccupancy, FlightsService } from '@skyrocket/ng-api-client';
 import { BookingService } from '../_services/booking.service';
 
 @Component({
@@ -8,11 +9,14 @@ import { BookingService } from '../_services/booking.service';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.sass'],
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
   bookForm: FormGroup;
+
+  private offers: FlightOfferWithOccupancy[] = [];
 
   constructor(
     private bookingService: BookingService,
+    private flightService: FlightsService,
     private formBuilder: FormBuilder,
     private router: Router,
   ) {
@@ -24,6 +28,22 @@ export class HomeComponent {
         dateArrival: '',
       }),
     });
+  }
+
+  // convenience getter to retrieve all departure airports from flight offerings
+  get departures(): string[] {
+    return this.offers
+      .filter((offer) => (this.form('arrival') ? (this.form('arrival') === offer.arrivalIcao) : true))
+      .map((offer) => offer.departureIcao);
+  }
+
+  // convenience getter to retrieve all arrival airports from flight offerings
+  get arrivals(): string[] {
+    return this.offers.map((offer) => offer.arrivalIcao);
+  }
+
+  ngOnInit(): void {
+    this.flightService.readOffer().subscribe((offers) => { this.offers = offers; });
   }
 
   form(control: string): string {
