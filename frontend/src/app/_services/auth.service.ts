@@ -38,6 +38,6 @@ export class AuthService {
   }
 
   hasRole(role: Role): boolean {
-    return isAuthUser(this.#user) ? this.#user.roles?.indexOf(role) > -1 : false
+    return isAuthUser(this.#user) ? this.#user.roles?.indexOf(role) > -1 : false;
   }
 }

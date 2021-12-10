@@ -144,7 +144,7 @@
             {{ element.offerId }}
           </td>
         </ng-container>
-        
+
         <!-- Departure ICAO Column -->
         <ng-container matColumnDef="departureIcao">
           <th mat-header-cell *matHeaderCellDef scope="col">Departure ICAO</th>
@@ -157,7 +157,7 @@
         <ng-container matColumnDef="departureTime">
           <th mat-header-cell *matHeaderCellDef scope="col">Departure Time</th>
           <td mat-cell *matCellDef="let element">
-            {{ element.departureTime }}
+            {{ formatDate(element.departureTime) }}
           </td>
         </ng-container>
 
@@ -170,7 +170,7 @@
         <!-- Arrival Time Column -->
         <ng-container matColumnDef="arrivalTime">
           <th mat-header-cell *matHeaderCellDef scope="col">Arrival Time</th>
-          <td mat-cell *matCellDef="let element">{{ element.arrivalTime }}</td>
+          <td mat-cell *matCellDef="let element">{{ formatDate(element.arrivalTime) }}</td>
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayedColumnsFlight"></tr>

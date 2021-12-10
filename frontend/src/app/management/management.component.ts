@@ -1,4 +1,3 @@
-import { InterpolationConfig } from '@angular/compiler';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {
@@ -7,7 +6,6 @@ import {
   FlightOffer,
   FlightsService,
 } from '@skyrocket/ng-api-client';
-import { AuthService } from '../_services/auth.service';
 
 interface FlightOfferPrint {
   value: number;
@@ -21,6 +19,7 @@ interface FlightOfferPrint {
 })
 export class ManagementComponent implements OnInit {
   managementFlightForm: FormGroup;
+
   managementFlightOfferForm: FormGroup;
 
   displayedColumnsFlight: string[] = [
@@ -34,14 +33,17 @@ export class ManagementComponent implements OnInit {
   displayedColumnsFlightOffer: string[] = ['id', 'seats', 'price', 'currency'];
 
   dataSourceFlight: Flight[] = [];
+
   dataSourceFlightOffer: FlightOffer[] = [];
+
   flightOffers: FlightOfferPrint[] = [];
+
   currencies: string[] = Object.keys(Currency);
 
   constructor(
     private flightForm: FormBuilder,
     private flightOfferForm: FormBuilder,
-    private flightService: FlightsService
+    private flightService: FlightsService,
   ) {
     this.managementFlightForm = this.flightForm.group({
       idFlightOffer: ['', [Validators.required.bind(this)]],
@@ -98,18 +100,11 @@ export class ManagementComponent implements OnInit {
             ' seats, ',
             flightOffer.price.toString(),
             ' ',
-            flightOffer.currency
+            flightOffer.currency,
           ),
         });
-      });
-
-      this.flightOffers.forEach((flightOffer) => {
-        this.flightService.readFlights(flightOffer.value).subscribe((flights) => {
-          flights.forEach((flight) => {
-            console.warn(flight);
-            this.dataSourceFlight.push(flight);
-          });
-          console.warn(this.dataSourceFlight);
+        this.flightService.readFlights(flightOffer.id).subscribe((flights) => {
+          this.dataSourceFlight = [...this.dataSourceFlight, ...flights];
         });
       });
     });
@@ -123,18 +118,18 @@ export class ManagementComponent implements OnInit {
           {
             departureIcao: this.form(
               'departureIcao',
-              this.managementFlightForm
+              this.managementFlightForm,
             ),
             departureTime: new Date(
-              this.form('departureTime', this.managementFlightForm)
-            ).toUTCString(),
+              this.form('departureTime', this.managementFlightForm),
+            ),
             arrivalIcao: this.form('arrivalIcao', this.managementFlightForm),
             arrivalTime: new Date(
-              this.form('arrivalTime', this.managementFlightForm)
-            ).toUTCString(),
+              this.form('arrivalTime', this.managementFlightForm),
+            ),
           },
         ],
-        parseInt(this.form('idFlightOffer', this.managementFlightForm), 10)
+        parseInt(this.form('idFlightOffer', this.managementFlightForm), 10),
       )
       .subscribe(() => {
         this.ngOnInit();
@@ -149,11 +144,15 @@ export class ManagementComponent implements OnInit {
         price: parseInt(this.form('price', this.managementFlightOfferForm), 10),
         currency: this.form(
           'currency',
-          this.managementFlightOfferForm
+          this.managementFlightOfferForm,
         ) as Currency,
       })
       .subscribe(() => {
         this.ngOnInit();
       });
+  }
+
+  formatDate(date: string): string {
+    return new Date(date).toISOString().split('.')[0].replace('T', ' ');
   }
 }
