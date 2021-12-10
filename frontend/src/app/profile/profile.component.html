@@ -82,6 +82,34 @@
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
       </table>
+
+      <h2 class="mt-2">Your Sessions</h2>
+      <table mat-table [dataSource]="sessions" aria-label="sessions">
+        <!-- Established Column -->
+        <ng-container matColumnDef="established">
+          <th mat-header-cell *matHeaderCellDef scope="col">Established</th>
+          <td mat-cell *matCellDef="let element">{{ formatDate(element.established) }}</td>
+        </ng-container>
+
+        <!-- Device Info Column -->
+        <ng-container matColumnDef="device">
+          <th mat-header-cell *matHeaderCellDef scope="col">Device</th>
+          <td mat-cell *matCellDef="let element">{{ element.data }}</td>
+        </ng-container>
+
+        <!-- Action Button Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef scope="col">Actions</th>
+          <td mat-cell *matCellDef="let element">
+            <button mat-mini-fab color="warn" (click)="revokeSession(element.id)">
+              <mat-icon aria-label="Button with trash icon">delete_permanently</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="sessionDisplayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: sessionDisplayedColumns"></tr>
+      </table>
     </div>
   </div>
 </div>

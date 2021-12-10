@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Address, AddressesService } from '@skyrocket/ng-api-client';
+import {
+  Address, AddressesService, Session, SessionsService,
+} from '@skyrocket/ng-api-client';
 import { AuthService } from '../_services/auth.service';
 
 @Component({
@@ -21,10 +23,19 @@ export class ProfileComponent implements OnInit {
 
   dataSource: Address[] = [];
 
+  sessions: Session[] = [];
+
+  sessionDisplayedColumns: string[] = [
+    'established',
+    'device',
+    'actions',
+  ];
+
   constructor(
     private addressForm: FormBuilder,
     private addressesService: AddressesService,
     private authService: AuthService,
+    private sessionService: SessionsService,
   ) {
     this.profileAddressForm = this.addressForm.group({
       street: ['', [Validators.required.bind(this)]],
@@ -35,9 +46,20 @@ export class ProfileComponent implements OnInit {
     });
   }
 
+  formatDate(date: string): string {
+    return date.split('T').slice(1, 4).join(' ');
+  }
+
   ngOnInit() {
     this.addressesService.read(this.authService.id).subscribe((addresses) => {
       this.dataSource = addresses;
+    });
+    this.updateSessionsTable();
+  }
+
+  updateSessionsTable() {
+    this.sessionService.read(this.authService.id).subscribe((sessions) => {
+      this.sessions = sessions;
     });
   }
 
@@ -48,6 +70,11 @@ export class ProfileComponent implements OnInit {
   isInvalid(name: string): boolean {
     const control = this.profileAddressForm.controls[name];
     return control.touched && control.invalid;
+  }
+
+  revokeSession(id: number) {
+    // eslint-disable-next-line no-underscore-dangle
+    this.sessionService._delete(this.authService.id, id).subscribe();
   }
 
   onSubmit() {
