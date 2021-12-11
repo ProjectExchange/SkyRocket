@@ -7,21 +7,21 @@ CREATE TABLE `users` (
     `birthday` DATE NOT NULL,
     `gender` enum('male', 'female', 'diverse') NOT NULL,
     PRIMARY KEY (`id`)
-);
+) ENGINE=InnoDB ENCRYPTED=YES;
 
 CREATE TABLE `users_oauth_github` (
     `user_id` INT(255) NOT NULL UNIQUE,
     `github_id` INT(255) NOT NULL UNIQUE,
     PRIMARY KEY (`github_id`),
     FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-);
+) ENGINE=InnoDB ENCRYPTED=YES;
 
 CREATE TABLE `users_roles` (
     `user_id` INT(255) NOT NULL,
     `role` enum('admin') NOT NULL, -- enum values must be written in snake_case
     PRIMARY KEY (`user_id`, `role`),
     FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-);
+) ENGINE=InnoDB ENCRYPTED=YES;
 
 CREATE TABLE `addresses` (
     `id` INT(255) NOT NULL AUTO_INCREMENT,
@@ -33,7 +33,7 @@ CREATE TABLE `addresses` (
     `house_number` INT(255) NOT NULL,
     PRIMARY KEY (`id`),
     FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-);
+) ENGINE=InnoDB ENCRYPTED=YES;
 
 CREATE TABLE `flights_offers` (
     `id` INT(255) NOT NULL AUTO_INCREMENT,
@@ -41,7 +41,7 @@ CREATE TABLE `flights_offers` (
     `price` FLOAT(7,2) NOT NULL,
     `currency` enum('dollar', 'euro') NOT NULL,
     PRIMARY KEY (`id`)
-);
+) ENGINE=InnoDB ENCRYPTED=YES;
 
 CREATE TABLE `flights` (
     `id` INT(255) NOT NULL AUTO_INCREMENT,
@@ -52,7 +52,7 @@ CREATE TABLE `flights` (
     `arrival_time` DATETIME NOT NULL,
     PRIMARY KEY (`id`),
     FOREIGN KEY (`offer_id`) REFERENCES `flights_offers` (`id`)
-);
+) ENGINE=InnoDB ENCRYPTED=YES;
 
 CREATE TABLE `bookings`(
     `user_id` INT(255) NOT NULL,
@@ -61,7 +61,7 @@ CREATE TABLE `bookings`(
     PRIMARY KEY (`user_id`, `offer_id`),
     FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
     FOREIGN KEY (`offer_id`) REFERENCES `flights_offers` (`id`)
-);
+) ENGINE=InnoDB ENCRYPTED=YES;
 
 CREATE TABLE `sessions`(
     `id` INT(255) NOT NULL AUTO_INCREMENT,
@@ -71,4 +71,4 @@ CREATE TABLE `sessions`(
     `data` VARCHAR(255) NOT NULL,
     PRIMARY KEY (`id`),
     FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-);
+) ENGINE=InnoDB ENCRYPTED=YES;
