@@ -4,7 +4,7 @@ use crate::db::models::{
 };
 use crate::db::Db;
 use crate::oso::{OsoAction, OsoState};
-use crate::routes::{error, ApiResult};
+use crate::routes::{error, ApiResult, UserAgent};
 use crate::session;
 use rocket::http::{CookieJar, Status};
 use rocket::serde::json::Json;
@@ -17,6 +17,7 @@ use rocket_okapi::{
 async fn create(
     actor: GithubOAuthRegistrar,
     db: Db,
+    ua: UserAgent,
     cookies: &CookieJar<'_>,
     new_user: Json<NewUser>,
 ) -> ApiResult<Json<AuthUser>> {
@@ -52,8 +53,19 @@ async fn create(
         .await
         .ok_or_else(|| error("", Status::InternalServerError, ""))?;
 
+    // revoke GitHub ID session
     session::revoke(cookies).await;
-    session::set_user(cookies, auth_user.clone()).await;
+    // save authenticated user session
+    Session::save(&db, cookies, ua, auth_user.clone())
+        .await
+        .map_err(|e| {
+            error(
+                e,
+                Status::InternalServerError,
+                "Error saving session, please try again later",
+            )
+        })?;
+
     Ok(Json(auth_user))
 }
 
