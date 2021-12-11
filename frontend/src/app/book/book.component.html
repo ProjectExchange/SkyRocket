@@ -12,11 +12,11 @@
           <ng-template matStepLabel>Check your flight data</ng-template>
           <mat-list>
             <mat-list-item
-              >Departure&emsp;<strong>{{ departure }}</strong></mat-list-item
+              >Destination&emsp;<strong>{{ bookingService.arrival }}</strong></mat-list-item
             >
             <mat-divider></mat-divider>
             <mat-list-item
-              >Arrival&emsp;<strong>{{ arrival }}</strong></mat-list-item
+              >Departure&emsp;<strong>{{ bookingService.departure }}</strong></mat-list-item
             >
             <mat-divider></mat-divider>
             <mat-list-item
@@ -39,10 +39,10 @@
                 <mat-label>Flight</mat-label>
                 <mat-select name="flight" formControlName="flight">
                   <mat-option
-                    *ngFor="let flight of flights"
-                    [value]="flight.value"
+                    *ngFor="let offer of offers"
+                    [value]="offer.id"
                   >
-                    {{ flight.viewValue }}
+                    {{ offer.departureIcao }} → {{ offer.arrivalIcao }}
                   </mat-option>
                 </mat-select>
               </mat-form-field>
@@ -93,9 +93,10 @@
                 <mat-select name="address" formControlName="address">
                   <mat-option
                     *ngFor="let address of addresses"
-                    [value]="address.value"
+                    [value]="address.id"
                   >
-                    {{ address.viewValue }}
+                    {{ address.street }} {{ address.houseNumber }},
+                    {{ address.postalCode }} {{ address.town }} {{ address.country }}
                   </mat-option>
                 </mat-select>
               </mat-form-field>

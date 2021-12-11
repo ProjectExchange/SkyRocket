@@ -17,4 +17,6 @@ export interface FlightOfferWithOccupancy {
     occupied: number;
     price: number;
     currency: Currency;
+    departureIcao: string;
+    arrivalIcao: string;
 }

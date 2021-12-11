@@ -42,6 +42,15 @@ where
     )
 }
 
+#[derive(FromForm, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct OfferFilter {
+    #[field(name = "departureIcao")]
+    pub departure_icao: Option<String>,
+    #[field(name = "arrivalIcao")]
+    pub arrival_icao: Option<String>,
+}
+
 /// This schema provides redirect url's for all configured OAuth providers. If a provider is not
 /// configured, a null value is returned
 #[derive(Deserialize, Serialize, JsonSchema)]

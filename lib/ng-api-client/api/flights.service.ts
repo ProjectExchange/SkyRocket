@@ -256,13 +256,25 @@ export class FlightsService {
     /**
      * 
      * 
+     * @param departureIcao 
+     * @param arrivalIcao 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public readOffer(observe?: 'body', reportProgress?: boolean): Observable<Array<FlightOfferWithOccupancy>>;
-    public readOffer(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<FlightOfferWithOccupancy>>>;
-    public readOffer(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<FlightOfferWithOccupancy>>>;
-    public readOffer(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public readOffer(departureIcao?: string, arrivalIcao?: string, observe?: 'body', reportProgress?: boolean): Observable<Array<FlightOfferWithOccupancy>>;
+    public readOffer(departureIcao?: string, arrivalIcao?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<FlightOfferWithOccupancy>>>;
+    public readOffer(departureIcao?: string, arrivalIcao?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<FlightOfferWithOccupancy>>>;
+    public readOffer(departureIcao?: string, arrivalIcao?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (departureIcao !== undefined && departureIcao !== null) {
+            queryParameters = queryParameters.set('departureIcao', <any>departureIcao);
+        }
+        if (arrivalIcao !== undefined && arrivalIcao !== null) {
+            queryParameters = queryParameters.set('arrivalIcao', <any>arrivalIcao);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -281,6 +293,7 @@ export class FlightsService {
 
         return this.httpClient.request<Array<FlightOfferWithOccupancy>>('get',`${this.basePath}/offers/`,
             {
+                params: queryParameters,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,

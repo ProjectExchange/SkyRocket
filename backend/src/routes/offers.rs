@@ -1,3 +1,4 @@
+use super::OfferFilter;
 use crate::db::models::{
     AdminRole, AuthUser, Booking, Flight, FlightOffer, FlightOfferWithOccupancy, NewFlight,
     NewFlightOffer,
@@ -29,9 +30,13 @@ async fn create_offer(
 }
 
 #[openapi(tag = "Flights")]
-#[get("/")]
-async fn read_offer(_actor: AuthUser, db: Db) -> ApiResult<Json<Vec<FlightOfferWithOccupancy>>> {
-    Ok(Json(FlightOfferWithOccupancy::get_all(&db).await))
+#[get("/?<filter..>")]
+async fn read_offer(
+    _actor: AuthUser,
+    db: Db,
+    filter: OfferFilter,
+) -> ApiResult<Json<Vec<FlightOfferWithOccupancy>>> {
+    Ok(Json(FlightOfferWithOccupancy::get_all(&db, filter).await))
 }
 
 #[openapi(tag = "Flights")]

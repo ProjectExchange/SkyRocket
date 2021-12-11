@@ -4,38 +4,33 @@
     <h1 class="mb-2">
       Buchen Sie günstige Flüge mit <strong>SkyRocket</strong>
     </h1>
-    <form
-      class="header-search-form"
-      [formGroup]="bookForm"
-      (ngSubmit)="onSubmit()"
-    >
+    <form class="header-search-form" [formGroup]="bookForm" (ngSubmit)="onSubmit()">
+
       <mat-form-field class="header-search-input" appearance="fill">
-        <mat-label>Departure</mat-label>
-        <input
-          matInput
-          formControlName="departure"
-          placeholder="San Francisco"
-        />
-        <mat-icon matSuffix>flight_takeoff</mat-icon>
-      </mat-form-field>
-      <mat-form-field class="header-search-input" appearance="fill">
-        <mat-label>Arrival</mat-label>
-        <input matInput formControlName="arrival" placeholder="California" />
+        <mat-label>Destination</mat-label>
+        <mat-select name="arrival" formControlName="arrival">
+          <mat-option *ngFor="let arrival of arrivals" [value]="arrival">
+            {{ arrival }}
+          </mat-option>
+        </mat-select>
         <mat-icon matSuffix>flight_land</mat-icon>
       </mat-form-field>
+
+      <mat-form-field class="header-search-input" appearance="fill">
+        <mat-label>Departure</mat-label>
+        <mat-select name="departure" formControlName="departure">
+          <mat-option *ngFor="let departure of departures" [value]="departure">
+            {{ departure }}
+          </mat-option>
+        </mat-select>
+        <mat-icon matSuffix>flight_takeoff</mat-icon>
+      </mat-form-field>
+
       <mat-form-field class="header-search-input" appearance="fill">
         <mat-label>Enter a date range</mat-label>
         <mat-date-range-input [rangePicker]="picker" formGroupName="date">
-          <input
-            matStartDate
-            formControlName="dateDeparture"
-            placeholder="Departure"
-          />
-          <input
-            matEndDate
-            formControlName="dateArrival"
-            placeholder="Arrival"
-          />
+          <input matStartDate formControlName="dateDeparture" placeholder="Departure" />
+          <input matEndDate formControlName="dateArrival" placeholder="Arrival" />
         </mat-date-range-input>
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-date-range-picker #picker></mat-date-range-picker>
@@ -59,11 +54,7 @@
           <mat-card-header>
             <mat-card-title>New York {{ num }}</mat-card-title>
           </mat-card-header>
-          <img
-            mat-card-image
-            src="/assets/img/nyc-4854718_1920.jpg"
-            alt="New York City"
-          />
+          <img mat-card-image src="/assets/img/nyc-4854718_1920.jpg" alt="New York City" />
           <mat-card-content>
             <p>The Himalayas is a mountain range in Asia.</p>
           </mat-card-content>
@@ -86,11 +77,7 @@
           <mat-card-header>
             <mat-card-title>Flight {{ num }}</mat-card-title>
           </mat-card-header>
-          <img
-            mat-card-image
-            src="/assets/img/airplane-4974678_1920.jpg"
-            alt="Airplane"
-          />
+          <img mat-card-image src="/assets/img/airplane-4974678_1920.jpg" alt="Airplane" />
           <mat-card-content>
             <p>The Himalayas is a mountain range in Asia.</p>
           </mat-card-content>

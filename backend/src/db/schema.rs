@@ -41,7 +41,7 @@ table! {
 }
 
 table! {
-    use diesel::sql_types::{BigInt, Float, Integer};
+    use diesel::sql_types::{BigInt, Float, Integer, Varchar};
     use crate::db::models::CurrencyMapping;
     flights_offers_with_occupancy (id) {
         id -> Integer,
@@ -49,6 +49,8 @@ table! {
         occupied -> BigInt,
         price -> Float,
         currency -> CurrencyMapping,
+        departure_icao -> Varchar,
+        arrival_icao -> Varchar,
     }
 }
 
