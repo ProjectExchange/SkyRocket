@@ -11,10 +11,19 @@ services:
     ports:
       - 3306:3306
     volumes:
-      - "./data/db:/var/lib/mysql:Z"
+      - "./data/db/:/var/lib/mysql/:Z"
       - "./config/mysql/my.cnf:/etc/mysql/conf.d/ssl.cnf:Z"
       - "./config/mysql/encryption/:/etc/mysql/encryption/:Z"
-#      - "./config/mysql/certs:/etc/ssl/mysql"
+      - "./certs/mariadb/server/:/etc/ssl/mysql/:Z"
+      - "./certs/ca-cert.pem:/etc/ssl/mysql/ca-cert.pem:z"
   redis:
+    command: "redis-server /usr/local/etc/redis/redis.conf"
     image: redis:alpine
     restart: always
+    volumes:
+      # should contain redis.conf with `requirepass <YOUR_SECRET_PASS>`
+      - "./config/redis/:/usr/local/etc/redis/:Z"
+      - "./certs/redis/server:/usr/local/etc/redis/tls/:Z"
+      - "./certs/ca-cert.pem:/usr/local/etc/redis/tls/ca-cert.pem:z"
+    ports:
+      - 6379:6379

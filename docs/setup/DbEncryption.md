@@ -52,3 +52,95 @@ as the SQL root user:
 ```sql
 SELECT * FROM information_schema.INNODB_TABLESPACES_ENCRYPTION;
 ```
+
+## Encryption in transit
+[Documentation](https://mariadb.com/kb/en/securing-connections-for-client-and-server/)
+
+To enable encryption in transit, we first need to generate ssl certificates for our mariadb server.
+In addition to the normal TLS certificates, we also need a CA certificate.
+
+### Generate server certificates
+[Documentation](https://mariadb.com/docs/security/encryption/in-transit/create-self-signed-certificates-keys-openssl/)
+
+We will start by generating a CA private key like this:
+
+```sh
+openssl genrsa 2048 > ca-key.pem
+```
+
+We will now generate a CA x509 certificate from the private key:
+
+```sh
+openssl req -new -x509 -nodes -days 365 \
+   -subj "/CN=ca.sys.skyrocket.projectexchange.org/C=DE/L=BW" \
+   -key ca-key.pem \
+   -out ca-cert.pem
+```
+
+We also need a private server key and signing request:
+
+```sh
+openssl req -newkey rsa:2048 -nodes -days 365 \
+   -subj "/CN=mariadb-server.sys.skyrocket.projectexchange.org/C=DE/L=BW" \
+   -keyout server-key.pem \
+   -out server-req.pem
+```
+
+Those can be used to create our server certificate
+
+```sh
+openssl x509 -req -days 365 -set_serial 01 \
+   -in server-req.pem \
+   -out server-cert.pem \
+   -CA ca-cert.pem \
+   -CAkey ca-key.pem
+```
+
+### Generate client certificates
+
+To authenticate our clients, we need to create a new client key and certificate.
+
+The private key and signing request are generated using
+
+```sh
+openssl req -newkey rsa:2048 -nodes -days 365 \
+   -subj "/CN=mariadb-client.sys.skyrocket.projectexchange.org/C=DE/L=BW" \
+   -keyout client-key.pem \
+   -out client-req.pem
+```
+
+and can be used to create a new x509 certificate
+
+```sh
+openssl x509 -req -days 365000 -set_serial 01 \
+   -in client-req.pem \
+   -out client-cert.pem \
+   -CA ca-cert.pem \
+   -CAkey ca-key.pem
+```
+
+### Validation
+
+To validate our new certificates, you can run
+
+```sh
+openssl verify -CAfile ca-cert.pem \
+   ca-cert.pem \
+   server-cert.pem
+```
+
+to verify the server certificate or
+
+```sh
+openssl verify -CAfile ca-cert.pem \
+   ca-cert.pem \
+   client-cert.pem
+```
+
+to verify the client certificate.
+
+If the client and server are configured with the given config files in the `docker/config` folder, a session can be verified to use TLS using the following SQL command:
+
+```sql
+SHOW SESSION STATUS LIKE 'Ssl_cipher';
+```
