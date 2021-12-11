@@ -133,6 +133,14 @@ pub struct FlightOffer {
     currency: Currency,
 }
 
+impl FlightOffer {
+    pub async fn get_all(db: &Db) -> Vec<Self> {
+        db.run(move |conn| flights_offers::table.load(conn))
+            .await
+            .unwrap_or_else(|_| Vec::new())
+    }
+}
+
 #[derive(Debug, Clone, Deserialize, Serialize, Identifiable, Queryable, JsonSchema)]
 #[serde(crate = "rocket::serde")]
 #[serde(rename_all = "camelCase")]
