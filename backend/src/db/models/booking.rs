@@ -57,7 +57,7 @@ impl Booking {
             .await
             .ok_or_else(|| error("", Status::NotFound, "Cannot find flight offer"))?;
 
-        if seats < 1 || offer.seats - (offer.occupied as i32) > seats {
+        if seats < 1 || offer.seats - (offer.occupied as i32) < seats {
             return Err(error("", Status::BadRequest, "Bad number of seats"));
         }
 
