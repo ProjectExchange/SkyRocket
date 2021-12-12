@@ -178,6 +178,36 @@
         <tr mat-header-row *matHeaderRowDef="displayedColumnsFlight"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumnsFlight"></tr>
       </table>
+
+      <h2 class="mt-2">All Bookings</h2>
+      <table mat-table [dataSource]="bookings" aria-label="bookings">
+        <!-- Offer ID Column -->
+        <ng-container matColumnDef="offerId">
+          <th mat-header-cell *matHeaderCellDef scope="col">Offer ID</th>
+          <td mat-cell *matCellDef="let element">{{ element.offerId }}</td>
+        </ng-container>
+
+        <!-- Departure Column -->
+        <ng-container matColumnDef="departure">
+          <th mat-header-cell *matHeaderCellDef scope="col">Departure</th>
+          <td mat-cell *matCellDef="let element">{{ element.departure }}</td>
+        </ng-container>
+
+        <!-- Arrival Column -->
+        <ng-container matColumnDef="arrival">
+          <th mat-header-cell *matHeaderCellDef scope="col">Arrival</th>
+          <td mat-cell *matCellDef="let element">{{ element.arrival }}</td>
+        </ng-container>
+
+        <!-- Seats Column -->
+        <ng-container matColumnDef="seats">
+          <th mat-header-cell *matHeaderCellDef scope="col">Seats</th>
+          <td mat-cell *matCellDef="let element">{{ element.seats }}</td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="bookingDisplayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: bookingDisplayedColumns"></tr>
+      </table>
     </div>
   </div>
 </div>

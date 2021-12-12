@@ -4,8 +4,18 @@ import {
   Currency,
   Flight,
   FlightOffer,
+  FlightOfferWithOccupancy,
   FlightsService,
+  UsersService,
 } from '@skyrocket/ng-api-client';
+import { AuthService } from '../_services/auth.service';
+
+interface BookingPrint {
+  offerId: number,
+  departure: string,
+  arrival: string,
+  seats: number,
+}
 
 interface FlightOfferPrint {
   value: number;
@@ -38,12 +48,25 @@ export class ManagementComponent implements OnInit {
 
   flightOffers: FlightOfferPrint[] = [];
 
+  bookings: BookingPrint[] = [];
+
+  bookingDisplayedColumns: string[] = [
+    'offerId',
+    'departure',
+    'arrival',
+    'seats',
+  ];
+
+  offers: {[key: number]: FlightOfferWithOccupancy} = {};
+
   currencies: string[] = Object.keys(Currency);
 
   constructor(
+    private authService: AuthService,
     private flightForm: FormBuilder,
     private flightOfferForm: FormBuilder,
     private flightService: FlightsService,
+    private usersService: UsersService,
   ) {
     this.managementFlightForm = this.flightForm.group({
       idFlightOffer: ['', [Validators.required.bind(this)]],
@@ -106,6 +129,39 @@ export class ManagementComponent implements OnInit {
         });
         this.flightService.readFlights(flightOffer.id).subscribe((flights) => {
           this.dataSourceFlight = [...this.dataSourceFlight, ...flights];
+        });
+      });
+    });
+
+    this.flightService.readOffer().subscribe((offers) => {
+      offers.forEach((offer) => {
+        this.offers[offer.id] = offer;
+      })
+      this.updateBookingsTable();
+    });
+  }
+
+  updateBookingsTable() {
+    this.usersService.listForUser().subscribe((users) => {
+      users.forEach((user) => {
+        this.flightService.readOfferBookings(user.id).subscribe((bookings) => {
+          this.bookings = [...this.bookings, ...bookings.map((booking) => {
+            if (this.offers[booking.offerId]) {
+              return {
+                offerId: booking.offerId,
+                departure: this.offers[booking.offerId].departureIcao,
+                arrival: this.offers[booking.offerId].arrivalIcao,
+                seats: booking.seats,
+              }
+            } else {
+              return {
+                offerId: booking.offerId,
+                departure: 'n/a',
+                arrival: 'n/a',
+                seats: booking.seats,
+              }
+            }
+          })];
         });
       });
     });
