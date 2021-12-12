@@ -1,7 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import {
-  Address, AddressesService, FlightOfferWithOccupancy, FlightsService,
+  Address,
+  AddressesService,
+  FlightOfferWithOccupancy,
+  FlightsService,
 } from '@skyrocket/ng-api-client';
 import { AuthService } from '../_services/auth.service';
 import { BookingService } from '../_services/booking.service';
@@ -24,13 +28,22 @@ export class BookComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private flightService: FlightsService,
     private addressService: AddressesService,
     private bookForm: FormBuilder,
+    private flightService: FlightsService,
+    private router: Router,
     public bookingService: BookingService,
   ) {
     this.bookFormStep1 = this.bookForm.group({
       flight: ['', Validators.required],
+      seats: [
+        '',
+        [
+          Validators.required.bind(this),
+          Validators.min(1),
+          Validators.max(2000),
+        ],
+      ],
     });
 
     this.bookFormStep2 = this.bookForm.group({
@@ -58,12 +71,29 @@ export class BookComponent implements OnInit {
     return this.formatDate(this.bookingService.dateArrival);
   }
 
+  form(name: string, formGroup: FormGroup): string {
+    return formGroup.controls[name].value;
+  }
+
+  bookNow(): void {
+    console.warn(parseInt(this.form('flight', this.bookFormStep1)));
+    this.flightService.createOfferBooking(
+      parseInt(this.form('flight', this.bookFormStep1), 10),
+      parseInt(this.form('seats', this.bookFormStep1), 10)
+    ).subscribe((res) => {
+      console.warn(res)
+      this.router.navigate(['/profile']);
+    });
+  }
+
   ngOnInit(): void {
     this.flightService.readOffer(
       this.bookingService.departure || undefined,
       this.bookingService.arrival || undefined,
     ).subscribe((offers) => {
-      this.offers = offers;
+      this.offers = offers.filter(function (offer) {
+        return offer.departureIcao !== '' && offer.arrivalIcao !== '';
+      });
     });
 
     this.addressService

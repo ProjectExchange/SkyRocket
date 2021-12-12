@@ -43,7 +43,11 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.flightService.readOffer().subscribe((offers) => { this.offers = offers; });
+    this.flightService.readOffer().subscribe((offers) => {
+      this.offers = offers.filter(function (offer) {
+        return offer.departureIcao !== '' && offer.arrivalIcao !== ''
+      });
+    });
   }
 
   form(control: string): string {

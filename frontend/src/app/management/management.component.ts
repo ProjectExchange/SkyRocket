@@ -58,16 +58,16 @@ export class ManagementComponent implements OnInit {
         '',
         [
           Validators.required.bind(this),
-          Validators.min(0),
-          Validators.max(1000),
+          Validators.min(1),
+          Validators.max(2000),
         ],
       ],
       price: [
         '',
         [
           Validators.required.bind(this),
-          Validators.min(0),
-          Validators.max(10000),
+          Validators.min(1),
+          Validators.max(99999),
         ],
       ],
       currency: ['', [Validators.required.bind(this)]],
@@ -85,9 +85,10 @@ export class ManagementComponent implements OnInit {
 
   ngOnInit(): void {
     // clear due push below
-    this.flightOffers = [];
+    this.flightOffers = []
+    this.dataSourceFlight = [];
 
-    this.flightService.readOffer().subscribe((offers) => {
+    this.flightService.readOfferRaw().subscribe((offers) => {
       this.dataSourceFlightOffer = offers;
       this.dataSourceFlightOffer.forEach((flightOffer) => {
         this.flightOffers.push({
