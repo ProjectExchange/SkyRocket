@@ -10,6 +10,7 @@
 <p align="center">
   <img src="https://github.com/ProjectExchange/SkyRocket/actions/workflows/linting.yml/badge.svg" alt="Linting CI" />
   <img src="https://github.com/ProjectExchange/SkyRocket/actions/workflows/sonarqube.yml/badge.svg" alt="SonarQube CI" />
+  <br />
   <img src="https://github.com/ProjectExchange/SkyRocket/actions/workflows/docker-publish-backend.yml/badge.svg" alt="Docker publish backend CI" />
   <img src="https://github.com/ProjectExchange/SkyRocket/actions/workflows/docker-publish-frontend.yml/badge.svg" alt="Docker publish frontend CI" />
 </p>
