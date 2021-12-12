@@ -3,6 +3,8 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { Router } from '@angular/router';
+import { AddressesService, FlightsService } from '@skyrocket/ng-api-client';
 
 import { BookComponent } from './book.component';
 
@@ -19,13 +21,17 @@ describe('BookComponent', () => {
         MatSelectModule,
         ReactiveFormsModule,
       ],
+      providers: [
+        { provide: AddressesService, useValue: AddressesService },
+        { provide: FlightsService, useValue: FlightsService },
+        { provide: Router, useValue: Router },
+      ],
     }).compileComponents();
   });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(BookComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   it('should create', () => {
