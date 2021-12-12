@@ -24,7 +24,7 @@
     "@angular/material": "^13.1.0",
     "@angular/platform-browser": "^13.1.0",
     "@angular/platform-browser-dynamic": "^13.1.0",
-    "@angular/router": "^13.0.2",
+    "@angular/router": "^13.1.0",
     "@skyrocket/ng-api-client": "file:../lib/ng-api-client/dist",
     "rxjs": "~7.4.0",
     "svg-country-flags": "^1.2.10",
