@@ -1,7 +1,7 @@
 version: '3.1'
 services:
   web:
-    image: ghcr.io/projectexchange/skyrocket/frontend
+    image: ghcr.io/projectexchange/skyrocket/frontend:v1.0.0
     restart: always
     ports:
       - 8080:80
@@ -12,7 +12,7 @@ services:
       - web
 
   backend:
-    image: ghcr.io/projectexchange/skyrocket/backend
+    image: ghcr.io/projectexchange/skyrocket/backend:v1.0.0
     restart: always
     depends_on:
       - "db"

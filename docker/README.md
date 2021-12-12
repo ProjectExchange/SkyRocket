@@ -11,7 +11,18 @@ MYSQL_USER=skyrocket
 MYSQL_PASSWORD=skyrocket
 ```
 
-Make sure to adapt to variables to your needs. Afterwards, simply run
+Since this application encrypts its database by default, some configuration has to be done before
+the development can start. Inside the `config/mysql/encryption` folder execute the commands documented
+[here](../docs/setup/DbEncryption.md#encryption-at-rest).
+
+In the end, your folder should have the following content:
+
+```sh
+$ ls config/mysql/encryption/
+keyfile.enc  keyfile.key
+```
+
+Make sure to adapt the variables inside `docker-compose.dev.yml` to your needs. Afterwards, simply run
 
 ```sh
 docker-compose -f docker-compose.dev.yml up -d
