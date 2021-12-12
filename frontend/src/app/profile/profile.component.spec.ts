@@ -1,6 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
-import { AddressesService } from '@skyrocket/ng-api-client';
+import {
+  AddressesService,
+  FlightsService,
+  SessionsService,
+} from '@skyrocket/ng-api-client';
 
 import { ProfileComponent } from './profile.component';
 
@@ -12,7 +16,11 @@ describe('ProfileComponent', () => {
     await TestBed.configureTestingModule({
       declarations: [ProfileComponent],
       imports: [ReactiveFormsModule],
-      providers: [{ provide: AddressesService, useValue: AddressesService }],
+      providers: [
+        { provide: AddressesService, useValue: AddressesService },
+        { provide: FlightsService, useValue: FlightsService },
+        { provide: SessionsService, useValue: SessionsService },
+      ],
     }).compileComponents();
   });
 
