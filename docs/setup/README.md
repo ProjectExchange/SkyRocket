@@ -16,7 +16,7 @@ You need the `docker` and `scripts` folder on your host.
 
 # Generate the certificates
 
-Since we want to encrypt our database in transit as well as at rest as we furthered explained [here](DbEncryption.md), we start bei generating our TLS certificates by executing the following command
+Since we want to encrypt our data in transit as well as at rest as we further explained [here](DbEncryption.md), we start bei generating our TLS certificates by executing the following command
 
 ```sh
 cd scripts && chmod +x *.sh && ./install.sh
