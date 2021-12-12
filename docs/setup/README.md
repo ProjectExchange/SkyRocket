@@ -32,7 +32,7 @@ The container mapping might cause permission issues with the private key files. 
 
 # Pulling a container image
 
-When using the GitHub registry within a private repository, the container images can only be accessed using a personal access token. To generate such a token , go to `Settings > Developer Settings > Personal access tokens` and create a new one with the scope `read:packages`.
+When using the GitHub registry within a private repository, the container images can only be accessed using a personal access token. To generate such a token, go to `Settings > Developer Settings > Personal access tokens` and create a new one with the scope `read:packages`.
 
 You can simply execute `docker login ghcr.io`, specify your GitHub email address and use the generated token as password and docker should return a success message. You can now easily pull the container images provided by the SkyRocket repository.
 
