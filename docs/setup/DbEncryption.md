@@ -144,3 +144,17 @@ If the client and server are configured with the given config files in the `dock
 ```sql
 SHOW SESSION STATUS LIKE 'Ssl_cipher';
 ```
+
+To enforce a specific certificate for a given user, the following SQL command can be used:
+
+```sql
+ALTER USER 'skyrocket'@'%' REQUIRE SUBJECT "/CN=mariadb-client.sys.skyrocket.projectexchange.org/C=DE/L=BW";
+```
+
+You can use this command directly from your host system:
+
+```sh
+docker exec -it docker_db_1 mysql -u root \
+   -p$(cat .env | grep MYSQL_ROOT_PASSWORD | cut -d '=' -f 2) \
+   -e "ALTER USER 'skyrocket'@'%' REQUIRE SUBJECT '/CN=mariadb-client.sys.skyrocket.projectexchange.org/C=DE/L=BW';"
+```

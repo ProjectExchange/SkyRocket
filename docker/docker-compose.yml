@@ -1,5 +1,24 @@
 version: '3.1'
 services:
+  backend:
+    image: skyrocket
+    restart: always
+    ports:
+      - 8001:8000
+    depends_on:
+      - "db"
+    environment:
+      REDIS_URL: ${REDIS_URL}
+      ROCKET_ADDRESS: 0.0.0.0
+      ROCKET_DATABASES: ${ROCKET_DATABASES}
+      ROCKET_SECRET_KEY: ${ROCKET_SECRET_KEY}
+      OAUTH_GITHUB_CLIENT_ID: ${OAUTH_GITHUB_CLIENT_ID}
+      OAUTH_GITHUB_CLIENT_SECRET: ${OAUTH_GITHUB_CLIENT_SECRET}
+    volumes:
+      - "./certs/mariadb/client/:/home/skyrocket/mysql/:Z"
+      - "./certs/ca-cert.pem:/home/skyrocket/mysql/ca-cert.pem:z"
+      - "./config/mysql/client.cnf:/home/skyrocket/.my.cnf:Z"
+
   db:
     image: mariadb
     restart: always

@@ -1,4 +1,4 @@
 [client]
-ssl_cert = /etc/ssl/mysql/client-cert.pem
-ssl_key = /etc/ssl/mysql/client-key.pem
-ssl_ca = /etc/ssl/mysql/ca-cert.pem
+ssl_cert = /home/skyrocket/mysql/client-cert.pem
+ssl_key = /home/skyrocket/mysql/client-key.pem
+ssl_ca = /home/skyrocket/mysql/ca-cert.pem
