@@ -76,7 +76,7 @@ export class ProfileComponent implements OnInit {
     this.flightService.readOffer().subscribe((offers) => {
       offers.forEach((offer) => {
         this.offers[offer.id] = offer;
-      })
+      });
       this.updateBookingsTable();
     });
   }
@@ -89,14 +89,13 @@ export class ProfileComponent implements OnInit {
             departure: this.offers[booking.offerId].departureIcao,
             arrival: this.offers[booking.offerId].arrivalIcao,
             seats: booking.seats,
-          }
-        } else {
-          return {
-            departure: 'n/a',
-            arrival: 'n/a',
-            seats: booking.seats,
-          }
+          };
         }
+        return {
+          departure: 'n/a',
+          arrival: 'n/a',
+          seats: booking.seats,
+        };
       });
     });
   }

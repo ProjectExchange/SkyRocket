@@ -108,7 +108,7 @@ export class ManagementComponent implements OnInit {
 
   ngOnInit(): void {
     // clear due push below
-    this.flightOffers = []
+    this.flightOffers = [];
     this.dataSourceFlight = [];
 
     this.flightService.readOfferRaw().subscribe((offers) => {
@@ -136,7 +136,7 @@ export class ManagementComponent implements OnInit {
     this.flightService.readOffer().subscribe((offers) => {
       offers.forEach((offer) => {
         this.offers[offer.id] = offer;
-      })
+      });
       this.updateBookingsTable();
     });
   }
@@ -152,15 +152,14 @@ export class ManagementComponent implements OnInit {
                 departure: this.offers[booking.offerId].departureIcao,
                 arrival: this.offers[booking.offerId].arrivalIcao,
                 seats: booking.seats,
-              }
-            } else {
-              return {
-                offerId: booking.offerId,
-                departure: 'n/a',
-                arrival: 'n/a',
-                seats: booking.seats,
-              }
+              };
             }
+            return {
+              offerId: booking.offerId,
+              departure: 'n/a',
+              arrival: 'n/a',
+              seats: booking.seats,
+            };
           })];
         });
       });

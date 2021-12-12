@@ -76,12 +76,10 @@ export class BookComponent implements OnInit {
   }
 
   bookNow(): void {
-    console.warn(parseInt(this.form('flight', this.bookFormStep1)));
     this.flightService.createOfferBooking(
       parseInt(this.form('flight', this.bookFormStep1), 10),
-      parseInt(this.form('seats', this.bookFormStep1), 10)
-    ).subscribe((res) => {
-      console.warn(res)
+      parseInt(this.form('seats', this.bookFormStep1), 10),
+    ).subscribe(() => {
       this.router.navigate(['/profile']);
     });
   }
@@ -91,9 +89,7 @@ export class BookComponent implements OnInit {
       this.bookingService.departure || undefined,
       this.bookingService.arrival || undefined,
     ).subscribe((offers) => {
-      this.offers = offers.filter(function (offer) {
-        return offer.departureIcao !== '' && offer.arrivalIcao !== '';
-      });
+      this.offers = offers.filter((offer) => offer.departureIcao !== '' && offer.arrivalIcao !== '');
     });
 
     this.addressService
