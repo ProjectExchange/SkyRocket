@@ -1,6 +1,6 @@
 <h1 align="center">
   <br />
-  <img src="https://raw.githubusercontent.com/ProjectExchange/SkyRocket/main/src/assets/logo.png" alt="SkyRocket" width="150"></a>
+  <img src="https://static.skyrocket.projectexchange.org/img/logo.png" alt="SkyRocket" width="150"></a>
   <br /><br />
   SkyRocket
   <br />
@@ -8,7 +8,10 @@
 
 <h3 align="center">🤖 Automated SAST Pipeline</h3>
 <p align="center">
+  <img src="https://github.com/ProjectExchange/SkyRocket/actions/workflows/linting.yml/badge.svg" alt="Linting CI" />
   <img src="https://github.com/ProjectExchange/SkyRocket/actions/workflows/sonarqube.yml/badge.svg" alt="SonarQube CI" />
+  <img src="https://github.com/ProjectExchange/SkyRocket/actions/workflows/docker-publish-backend.yml/badge.svg" alt="Docker publish backend CI" />
+  <img src="https://github.com/ProjectExchange/SkyRocket/actions/workflows/docker-publish-frontend.yml/badge.svg" alt="Docker publish frontend CI" />
 </p>
 
 <h3 align="center">🔒 SonarQube Monitored</h3>
@@ -35,6 +38,10 @@
 ## What is SkyRocket?
 
 SkyRocket is a secure booking service for flights, written in Rust and TypeScript.
+
+## Get started
+
+You can find the documentation for getting started [here](docs/).
 
 ## Folder overview
 
