@@ -8,9 +8,9 @@ use rocket::serde::Serialize;
 
 pub static REDIS: Lazy<RedisSessionStore> = Lazy::new(load);
 
-const COOKIE_NAME: &'static str = "session";
-const SESSION_USER_NAME: &'static str = "user";
-const SESSION_GITHUB_ID_NAME: &'static str = "github_id";
+const COOKIE_NAME: &str = "session";
+const SESSION_USER_NAME: &str = "user";
+const SESSION_GITHUB_ID_NAME: &str = "github_id";
 
 /// initialize redis with connection string from config
 fn load() -> RedisSessionStore {
@@ -45,30 +45,40 @@ async fn add_redis_session(key: &str, value: impl Serialize) -> Option<String> {
     REDIS.store_session(session).await.unwrap()
 }
 
-/// retrieve a session stored in redis
+/// Retrieve redis session key by the users browser cookies
 ///
 /// # Arguments
 ///
 /// * `cookies` - The cookie jar of the users browser, which holds the redis key
-async fn get_redis_session(cookies: &CookieJar<'_>) -> Option<Session> {
-    let cookie_value = cookies
+pub fn get_redis_session_key(cookies: &CookieJar<'_>) -> Option<String> {
+    cookies
         .get_private(COOKIE_NAME)
-        .and_then(|c| c.value().parse().ok())?;
-    REDIS.load_session(cookie_value).await.unwrap_or_else(|e| {
+        .and_then(|c| c.value().parse().ok())
+}
+
+/// Retrieve a session from redis
+///
+/// # Arguments
+///
+/// * `redis_key` - The key of the stored redis session
+async fn get_redis_session(redis_key: String) -> Option<Session> {
+    REDIS.load_session(redis_key).await.unwrap_or_else(|e| {
         eprintln! { "Error retrieving redis session: {}", e };
         None
     })
 }
 
-/// create a session for the current user, store it in redis and save a cookie to the users browser
+/// Create a session for the current user, store it in redis and save a cookie to the users browser.
+/// Returns the redis key to retrieve the session data
 ///
 /// # Arguments
 ///
 /// * `cookies` - The cookie jar of the users browser, which holds the redis key
 /// * `user` - The user to save the cookie for. User data is stored within redis
-pub async fn set_user(cookies: &CookieJar<'_>, user: AuthUser) {
-    let cookie_option = add_redis_session(SESSION_USER_NAME, user).await;
-    add_browser_cookie(cookies, COOKIE_NAME, cookie_option.unwrap());
+pub async fn set_user(cookies: &CookieJar<'_>, user: AuthUser) -> String {
+    let redis_key = add_redis_session(SESSION_USER_NAME, user).await.unwrap();
+    add_browser_cookie(cookies, COOKIE_NAME, redis_key.clone());
+    redis_key
 }
 
 /// Try to find an existing user by its session.
@@ -78,8 +88,8 @@ pub async fn set_user(cookies: &CookieJar<'_>, user: AuthUser) {
 /// * `cookies` - The cookie jar of the users browser, which holds the redis key
 /// * `id` - The users GitHub ID
 pub async fn set_github_id(cookies: &CookieJar<'_>, id: i32) {
-    let cookie_option = add_redis_session(SESSION_GITHUB_ID_NAME, id).await;
-    add_browser_cookie(cookies, COOKIE_NAME, cookie_option.unwrap());
+    let redis_key = add_redis_session(SESSION_GITHUB_ID_NAME, id).await;
+    add_browser_cookie(cookies, COOKIE_NAME, redis_key.unwrap());
 }
 
 /// Try to find an existing user by its session.
@@ -88,7 +98,8 @@ pub async fn set_github_id(cookies: &CookieJar<'_>, id: i32) {
 ///
 /// * `cookies` - The cookie jar of the users browser
 pub async fn get_user_from_session(cookies: &CookieJar<'_>) -> Option<AuthUser> {
-    get_redis_session(cookies).await?.get(SESSION_USER_NAME)
+    let key = get_redis_session_key(cookies)?;
+    get_redis_session(key).await?.get(SESSION_USER_NAME)
 }
 
 /// Try to find an existing user by its session.
@@ -97,22 +108,32 @@ pub async fn get_user_from_session(cookies: &CookieJar<'_>) -> Option<AuthUser> 
 ///
 /// * `cookies` - The cookie jar of the users browser
 pub async fn get_github_id(cookies: &CookieJar<'_>) -> Option<i32> {
-    get_redis_session(cookies)
-        .await?
-        .get(SESSION_GITHUB_ID_NAME)
+    let key = get_redis_session_key(cookies)?;
+    get_redis_session(key).await?.get(SESSION_GITHUB_ID_NAME)
 }
 
 /// Destroy the current user session. Session is removed in redis and the users browser
-/// cookie is deleted. Returns `Some(())` if successful, `None` otherwise.
+/// cookie is deleted. Returns the `Some(String)` where the content of String
+/// is the redis key if successful, `None` otherwise.
 ///
 /// # Arguments
 ///
 /// * `cookies` - The cookie jar of the users browser
-pub async fn revoke(cookies: &CookieJar<'_>) -> Option<()> {
-    let session = get_redis_session(cookies).await?;
-    REDIS.destroy_session(session).await.ok()?;
+pub async fn revoke(cookies: &CookieJar<'_>) -> Option<String> {
+    let key = get_redis_session_key(cookies)?;
     cookies.remove_private(Cookie::named(COOKIE_NAME));
-    Some(())
+    revoke_by_key(key.clone()).await?;
+    Some(key)
+}
+
+/// Destroy a redis session by the given key.
+///
+/// # Arguments
+///
+/// * `redis_key` - The redis key of the stored session
+pub async fn revoke_by_key(redis_key: String) -> Option<()> {
+    let session = get_redis_session(redis_key).await?;
+    REDIS.destroy_session(session).await.ok()
 }
 
 pub fn init() {

@@ -14,8 +14,10 @@ import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatRadioModule } from '@angular/material/radio';
+import { MatSelectCountryModule } from '@angular-material-extensions/select-country';
 import { MatSelectModule } from '@angular/material/select';
 import { MatStepperModule } from '@angular/material/stepper';
+import { MatTableModule } from '@angular/material/table';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -31,6 +33,7 @@ import { ProfileComponent } from './profile/profile.component';
 import { appInitializer } from './_services/app.initializer';
 import { AuthService } from './_services/auth.service';
 import { LogoutComponent } from './logout/logout.component';
+import { ManagementComponent } from './management/management.component';
 
 @NgModule({
   declarations: [
@@ -42,6 +45,7 @@ import { LogoutComponent } from './logout/logout.component';
     OauthComponent,
     ProfileComponent,
     LogoutComponent,
+    ManagementComponent,
   ],
   imports: [
     ApiModule,
@@ -60,8 +64,10 @@ import { LogoutComponent } from './logout/logout.component';
     MatInputModule,
     MatNativeDateModule,
     MatRadioModule,
+    MatSelectCountryModule.forRoot('en'),
     MatSelectModule,
     MatStepperModule,
+    MatTableModule,
     MatToolbarModule,
     ReactiveFormsModule,
   ],

@@ -6,6 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import { AddressesService } from './api/addresses.service';
 import { FlightsService } from './api/flights.service';
 import { LoginService } from './api/login.service';
+import { SessionsService } from './api/sessions.service';
 import { UsersService } from './api/users.service';
 
 @NgModule({
@@ -16,6 +17,7 @@ import { UsersService } from './api/users.service';
     AddressesService,
     FlightsService,
     LoginService,
+    SessionsService,
     UsersService ]
 })
 export class ApiModule {

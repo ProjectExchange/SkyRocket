@@ -1,7 +1,9 @@
 use super::{error, ApiResult};
 use super::{GitHubAccessTokenRequest, GitHubAccessTokenResponse, OAuthProviders};
+use crate::db::models::Session;
 use crate::db::models::{AuthUser, Gender, GitHubOAuthUser, NewUser};
 use crate::db::Db;
+use crate::routes::UserAgent;
 use crate::session;
 use crate::{http, CONFIG};
 use chrono::NaiveDate;
@@ -88,6 +90,7 @@ async fn login_github(
     db: Db,
     code: String,
     cookies: &CookieJar<'_>,
+    ua: UserAgent,
 ) -> ApiResult<RegistratedOrNewUser> {
     // validate token received from GitHub
     let oauth_res = http::post::<GitHubAccessTokenResponse, GitHubAccessTokenRequest>(
@@ -96,41 +99,49 @@ async fn login_github(
             client_id: CONFIG
                 .oauth_github_client_id
                 .as_ref()
-                .ok_or(error(Status::InternalServerError, ""))?,
+                .ok_or_else(|| error("", Status::InternalServerError, ""))?,
             client_secret: CONFIG
                 .oauth_github_client_secret
                 .as_ref()
-                .ok_or(error(Status::InternalServerError, ""))?,
+                .ok_or_else(|| error("", Status::InternalServerError, ""))?,
             code,
         },
     )
     .await
-    .map_err(|_e| error(Status::Unauthorized, "Failed to validate OAuth code"))?;
+    .map_err(|e| error(e, Status::Unauthorized, "Failed to validate OAuth code"))?;
 
     // fetch GitHub user data
     let user_res = http::get::<Value>("https://api.github.com/user", &oauth_res.access_token)
         .await
-        .map_err(|_e| error(Status::Unauthorized, "Failed to validate OAuth code"))?;
+        .map_err(|e| error(e, Status::Unauthorized, "Failed to validate OAuth code"))?;
 
     let github_id = user_res
         .get("id")
-        .ok_or(error(Status::InternalServerError, ""))?
+        .ok_or_else(|| error("", Status::InternalServerError, ""))?
         .as_i64()
-        .ok_or(error(Status::InternalServerError, ""))? as i32;
+        .ok_or_else(|| error("", Status::InternalServerError, ""))? as i32;
 
     if let Some(github_user) = GitHubOAuthUser::find_by_id(&db, github_id).await {
         let user = AuthUser::by_user_id(&db, github_user.user_id)
             .await
-            .ok_or(error(Status::InternalServerError, ""))?;
-        session::set_user(cookies, user.clone()).await;
+            .ok_or_else(|| error("", Status::InternalServerError, ""))?;
+        Session::save(&db, cookies, ua, user.clone())
+            .await
+            .map_err(|e| {
+                error(
+                    e,
+                    Status::InternalServerError,
+                    "Error saving session, please try again later",
+                )
+            })?;
         Ok(RegistratedOrNewUser::Registrated(Json(user)))
     } else {
         session::set_github_id(cookies, github_id).await;
         let mut iter = user_res
             .get("name")
-            .ok_or(error(Status::InternalServerError, ""))?
+            .ok_or_else(|| error("", Status::InternalServerError, ""))?
             .as_str()
-            .ok_or(error(Status::InternalServerError, ""))?
+            .ok_or_else(|| error("", Status::InternalServerError, ""))?
             .splitn(2, ' ');
         Ok(RegistratedOrNewUser::New(Json(NewUser {
             firstname: iter.next().unwrap().into(),
@@ -139,7 +150,7 @@ async fn login_github(
             gender: Gender::Male,
             email: user_res
                 .get("email")
-                .ok_or(error(Status::InternalServerError, ""))?
+                .ok_or_else(|| error("", Status::InternalServerError, ""))?
                 .as_str()
                 .unwrap_or("")
                 .into(),

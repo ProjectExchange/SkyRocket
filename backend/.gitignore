@@ -3,3 +3,5 @@
 
 # File from cargo clippy code scan
 clippy.report
+# Lcov code coverage report
+lcov.info

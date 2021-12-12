@@ -1,4 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ReactiveFormsModule } from '@angular/forms';
+import {
+  AddressesService,
+  FlightsService,
+  SessionsService,
+} from '@skyrocket/ng-api-client';
 
 import { ProfileComponent } from './profile.component';
 
@@ -9,13 +15,18 @@ describe('ProfileComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [ProfileComponent],
+      imports: [ReactiveFormsModule],
+      providers: [
+        { provide: AddressesService, useValue: AddressesService },
+        { provide: FlightsService, useValue: FlightsService },
+        { provide: SessionsService, useValue: SessionsService },
+      ],
     }).compileComponents();
   });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(ProfileComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   it('should create', () => {

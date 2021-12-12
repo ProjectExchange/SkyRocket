@@ -1,6 +1,6 @@
 use dotenv::dotenv;
 use once_cell::sync::Lazy;
-use std::{env};
+use std::env;
 
 pub static CONFIG: Lazy<Config> = Lazy::new(Config::load);
 
@@ -12,8 +12,8 @@ pub struct Config {
 
 fn read_opt_from_env(key: &str) -> Option<String> {
     match env::var(key) {
-        Ok(value) => return Some(value),
-        Err(_e) => return None,
+        Ok(value) => Some(value),
+        Err(_e) => None,
     }
 }
 

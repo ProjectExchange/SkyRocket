@@ -12,6 +12,14 @@
   >
   <div *ngIf="authService.isLoggedIn">
     <span class="navbar-text">Hi {{ authService.firstname }}!</span>
+    <a
+      *ngIf="this.authService.hasRole('Admin')"
+      class="navbar-btn"
+      mat-stroked-button
+      color="primary"
+      href="/management"
+      >Management</a
+    >
     <a class="navbar-btn" mat-stroked-button color="primary" href="/profile"
       >Profile</a
     >

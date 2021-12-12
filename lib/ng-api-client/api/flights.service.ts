@@ -17,9 +17,11 @@ import { CustomHttpUrlEncodingCodec }                        from '../encoder';
 
 import { Observable }                                        from 'rxjs';
 
+import { Booking } from '../model/booking';
 import { ErrorBody } from '../model/errorBody';
 import { Flight } from '../model/flight';
 import { FlightOffer } from '../model/flightOffer';
+import { FlightOfferWithOccupancy } from '../model/flightOfferWithOccupancy';
 import { NewFlight } from '../model/newFlight';
 import { NewFlightOffer } from '../model/newFlightOffer';
 
@@ -162,6 +164,58 @@ export class FlightsService {
      * 
      * 
      * @param id 
+     * @param seats 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public createOfferBooking(id: number, seats: number, observe?: 'body', reportProgress?: boolean): Observable<any>;
+    public createOfferBooking(id: number, seats: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<any>>;
+    public createOfferBooking(id: number, seats: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<any>>;
+    public createOfferBooking(id: number, seats: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+        if (id === null || id === undefined) {
+            throw new Error('Required parameter id was null or undefined when calling createOfferBooking.');
+        }
+
+        if (seats === null || seats === undefined) {
+            throw new Error('Required parameter seats was null or undefined when calling createOfferBooking.');
+        }
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (seats !== undefined && seats !== null) {
+            queryParameters = queryParameters.set('seats', <any>seats);
+        }
+
+        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.request<any>('post',`${this.basePath}/offers/${encodeURIComponent(String(id))}/bookings`,
+            {
+                params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * 
+     * 
+     * @param id 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -202,13 +256,25 @@ export class FlightsService {
     /**
      * 
      * 
+     * @param departureIcao 
+     * @param arrivalIcao 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public readOffer(observe?: 'body', reportProgress?: boolean): Observable<Array<FlightOffer>>;
-    public readOffer(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<FlightOffer>>>;
-    public readOffer(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<FlightOffer>>>;
-    public readOffer(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+    public readOffer(departureIcao?: string, arrivalIcao?: string, observe?: 'body', reportProgress?: boolean): Observable<Array<FlightOfferWithOccupancy>>;
+    public readOffer(departureIcao?: string, arrivalIcao?: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<FlightOfferWithOccupancy>>>;
+    public readOffer(departureIcao?: string, arrivalIcao?: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<FlightOfferWithOccupancy>>>;
+    public readOffer(departureIcao?: string, arrivalIcao?: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+
+
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
+        if (departureIcao !== undefined && departureIcao !== null) {
+            queryParameters = queryParameters.set('departureIcao', <any>departureIcao);
+        }
+        if (arrivalIcao !== undefined && arrivalIcao !== null) {
+            queryParameters = queryParameters.set('arrivalIcao', <any>arrivalIcao);
+        }
 
         let headers = this.defaultHeaders;
 
@@ -225,7 +291,85 @@ export class FlightsService {
         const consumes: string[] = [
         ];
 
-        return this.httpClient.request<Array<FlightOffer>>('get',`${this.basePath}/offers/`,
+        return this.httpClient.request<Array<FlightOfferWithOccupancy>>('get',`${this.basePath}/offers/`,
+            {
+                params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * 
+     * 
+     * @param id 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public readOfferBookings(id: number, observe?: 'body', reportProgress?: boolean): Observable<Array<Booking>>;
+    public readOfferBookings(id: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<Booking>>>;
+    public readOfferBookings(id: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<Booking>>>;
+    public readOfferBookings(id: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+        if (id === null || id === undefined) {
+            throw new Error('Required parameter id was null or undefined when calling readOfferBookings.');
+        }
+
+        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.request<Array<Booking>>('get',`${this.basePath}/offers/${encodeURIComponent(String(id))}/bookings`,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * 
+     * 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public readOfferRaw(observe?: 'body', reportProgress?: boolean): Observable<Array<FlightOffer>>;
+    public readOfferRaw(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<FlightOffer>>>;
+    public readOfferRaw(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<FlightOffer>>>;
+    public readOfferRaw(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.request<Array<FlightOffer>>('get',`${this.basePath}/offers/raw`,
             {
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,

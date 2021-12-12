@@ -41,7 +41,22 @@ table! {
 }
 
 table! {
-    sessions (redis_key) {
+    use diesel::sql_types::{BigInt, Float, Integer, Varchar};
+    use crate::db::models::CurrencyMapping;
+    flights_offers_with_occupancy (id) {
+        id -> Integer,
+        seats -> Integer,
+        occupied -> BigInt,
+        price -> Float,
+        currency -> CurrencyMapping,
+        departure_icao -> Varchar,
+        arrival_icao -> Varchar,
+    }
+}
+
+table! {
+    sessions (id) {
+        id -> Integer,
         user_id -> Integer,
         redis_key -> Varchar,
         established -> Datetime,

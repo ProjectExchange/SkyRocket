@@ -4,6 +4,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
+import { FlightsService } from '@skyrocket/ng-api-client';
 
 import { HomeComponent } from './home.component';
 
@@ -21,13 +22,13 @@ describe('HomeComponent', () => {
         ReactiveFormsModule,
         RouterTestingModule,
       ],
+      providers: [{ provide: FlightsService, useValue: FlightsService }],
     }).compileComponents();
   });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(HomeComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   it('should create', () => {

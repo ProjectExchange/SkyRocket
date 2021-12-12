@@ -7,11 +7,9 @@ use rocket::serde::json::Json;
 use rocket::serde::{Deserialize, Serialize};
 use rocket::Request;
 use rocket_okapi::gen::OpenApiGenerator;
-use rocket_okapi::okapi::schemars;
-use rocket_okapi::okapi::schemars::JsonSchema;
 use rocket_okapi::request::{OpenApiFromRequest, RequestHeaderInput};
 
-#[derive(Debug, Clone, Deserialize, Serialize, Queryable, Insertable, JsonSchema)]
+#[derive(Debug, Clone, Deserialize, Serialize, Queryable, Insertable)]
 #[serde(crate = "rocket::serde")]
 #[table_name = "users_oauth_github"]
 pub struct GitHubOAuthUser {
@@ -39,7 +37,7 @@ impl GitHubOAuthUser {
 }
 
 /// This schema is used to identify users that are registering a new GitHub OAuth connected account
-#[derive(Deserialize, Serialize, JsonSchema)]
+#[derive(Deserialize, Serialize)]
 #[serde(crate = "rocket::serde")]
 pub struct GithubOAuthRegistrar {
     pub github_id: i32,
