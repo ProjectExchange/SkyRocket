@@ -68,7 +68,7 @@ We will start by generating a CA private key like this:
 openssl genrsa 2048 > ca-key.pem
 ```
 
-We will now generate a CA x509 certificate from the private key:
+We will now generate a CA X.509 certificate from the private key:
 
 ```sh
 openssl req -new -x509 -nodes -days 365 \
@@ -109,10 +109,10 @@ openssl req -newkey rsa:2048 -nodes -days 365 \
    -out client-req.pem
 ```
 
-and can be used to create a new x509 certificate
+and can be used to create a new X.509 certificate
 
 ```sh
-openssl x509 -req -days 365000 -set_serial 01 \
+openssl x509 -req -days 365 -set_serial 01 \
    -in client-req.pem \
    -out client-cert.pem \
    -CA ca-cert.pem \
