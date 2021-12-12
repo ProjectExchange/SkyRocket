@@ -1,0 +1,29 @@
+version: '3.1'
+services:
+  db:
+    image: mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - 3306:3306
+    volumes:
+      - "./data/db/:/var/lib/mysql/:Z"
+      - "./config/mysql/my.cnf:/etc/mysql/conf.d/ssl.cnf:Z"
+      - "./config/mysql/encryption/:/etc/mysql/encryption/:Z"
+      - "./certs/mariadb/server/:/etc/ssl/mysql/:Z"
+      - "./certs/ca-cert.pem:/etc/ssl/mysql/ca-cert.pem:z"
+  redis:
+    command: "redis-server /usr/local/etc/redis/redis.conf"
+    image: redis:alpine
+    restart: always
+    volumes:
+      # should contain redis.conf with `requirepass <YOUR_SECRET_PASS>`
+      - "./config/redis/:/usr/local/etc/redis/:Z"
+      - "./certs/redis/server:/usr/local/etc/redis/tls/:Z"
+      - "./certs/ca-cert.pem:/usr/local/etc/redis/tls/ca-cert.pem:z"
+    ports:
+      - 6379:6379
