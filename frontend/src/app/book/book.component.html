@@ -9,7 +9,7 @@
       <mat-stepper orientation="vertical" linear="true" #stepper>
         <!-- flight data check -->
         <mat-step>
-          <ng-template matStepLabel>Check your flight data</ng-template>
+          <ng-template matStepLabel>General: Check your flight data</ng-template>
           <mat-list>
             <mat-list-item
               >Destination&emsp;<strong>{{ bookingService.arrival }}</strong></mat-list-item
@@ -26,14 +26,14 @@
             >
           </mat-list>
           <div>
-            <button mat-stroked-button matStepperNext>Next</button>
+            <button mat-button matStepperNext>Next</button>
           </div>
         </mat-step>
 
         <!-- flight selection -->
         <mat-step [stepControl]="bookFormStep1">
           <form [formGroup]="bookFormStep1">
-            <ng-template matStepLabel>Select your flight</ng-template>
+            <ng-template matStepLabel>General: Select your flight</ng-template>
             <div class="form-field-group">
               <mat-form-field appearance="fill">
                 <mat-label>Flight</mat-label>
@@ -42,9 +42,18 @@
                     *ngFor="let offer of offers"
                     [value]="offer.id"
                   >
-                    {{ offer.departureIcao }} → {{ offer.arrivalIcao }}
+                    {{ offer.departureIcao }} → {{ offer.arrivalIcao }} ({{ offer.price }} {{ offer.currency }}, {{ offer.occupied }}/{{ offer.seats }} seats occupied)
                   </mat-option>
                 </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="fill">
+                <mat-label>Amount of seats</mat-label>
+                <input
+                  matInput
+                  formControlName="seats"
+                  placeholder="Seats"
+                  required
+                />
               </mat-form-field>
             </div>
             <div>
@@ -57,7 +66,7 @@
         <!-- firstname and lastname -->
         <mat-step [stepControl]="bookFormStep2">
           <form [formGroup]="bookFormStep2">
-            <ng-template matStepLabel>Check your name</ng-template>
+            <ng-template matStepLabel>Payment: Check your name</ng-template>
             <mat-form-field class="content-book-input" appearance="fill">
               <mat-label>Firstname</mat-label>
               <input
@@ -86,7 +95,7 @@
         <!-- address selection -->
         <mat-step [stepControl]="bookFormStep3">
           <form [formGroup]="bookFormStep3">
-            <ng-template matStepLabel>Select your address</ng-template>
+            <ng-template matStepLabel>Payment: Select your address</ng-template>
             <div class="form-field-group">
               <mat-form-field appearance="fill">
                 <mat-label>Address</mat-label>
@@ -108,12 +117,34 @@
           </form>
         </mat-step>
 
+        <!-- payment selection -->
         <mat-step>
-          <ng-template matStepLabel>Done</ng-template>
-          <p>You are now done.</p>
+          <ng-template matStepLabel>Payment: Select your payment service</ng-template>
+          <div class="form-field-group">
+            <br />
+            <button mat-flat-button color="warn" deactivated>Visa</button>
+            <span>&nbsp;</span>
+            <button mat-flat-button color="warn" deactivated>Mastercard</button>
+            <span>&nbsp;</span>
+            <button mat-flat-button color="warn" deactivated>PayPal</button>
+            <br /><br />
+          </div>
+          <div>
+            <button mat-button matStepperPrevious>Back</button>
+            <button mat-button matStepperNext>Next</button>
+          </div>
+        </mat-step>
+
+        <mat-step>
+          <ng-template matStepLabel>Final step: Booking</ng-template>
+          <br />
+          <p>Payment successfully performed.</p>
           <div>
             <button mat-button matStepperPrevious>Back</button>
             <button mat-button (click)="stepper.reset()">Reset</button>
+            <button mat-flat-button color="primary" (click)="bookNow()">
+              Book now
+            </button>
           </div>
         </mat-step>
       </mat-stepper>

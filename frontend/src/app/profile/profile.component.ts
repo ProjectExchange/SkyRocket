@@ -1,9 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {
-  Address, AddressesService, Session, SessionsService,
+  Address, AddressesService, FlightOfferWithOccupancy, FlightsService, Session, SessionsService,
 } from '@skyrocket/ng-api-client';
 import { AuthService } from '../_services/auth.service';
+
+interface BookingPrint {
+  departure: string,
+  arrival: string,
+  seats: number,
+}
 
 @Component({
   selector: 'app-profile',
@@ -23,6 +29,16 @@ export class ProfileComponent implements OnInit {
 
   dataSource: Address[] = [];
 
+  bookings: BookingPrint[] = [];
+
+  bookingDisplayedColumns: string[] = [
+    'departure',
+    'arrival',
+    'seats',
+  ];
+
+  offers: {[key: number]: FlightOfferWithOccupancy} = {};
+
   sessions: Session[] = [];
 
   sessionDisplayedColumns: string[] = [
@@ -36,6 +52,7 @@ export class ProfileComponent implements OnInit {
     private addressesService: AddressesService,
     private authService: AuthService,
     private sessionService: SessionsService,
+    private flightService: FlightsService,
   ) {
     this.profileAddressForm = this.addressForm.group({
       street: ['', [Validators.required.bind(this)]],
@@ -55,6 +72,32 @@ export class ProfileComponent implements OnInit {
       this.dataSource = addresses;
     });
     this.updateSessionsTable();
+
+    this.flightService.readOffer().subscribe((offers) => {
+      offers.forEach((offer) => {
+        this.offers[offer.id] = offer;
+      });
+      this.updateBookingsTable();
+    });
+  }
+
+  updateBookingsTable() {
+    this.flightService.readOfferBookings(this.authService.id).subscribe((bookings) => {
+      this.bookings = bookings.map((booking) => {
+        if (this.offers[booking.offerId]) {
+          return {
+            departure: this.offers[booking.offerId].departureIcao,
+            arrival: this.offers[booking.offerId].arrivalIcao,
+            seats: booking.seats,
+          };
+        }
+        return {
+          departure: 'n/a',
+          arrival: 'n/a',
+          seats: booking.seats,
+        };
+      });
+    });
   }
 
   updateSessionsTable() {

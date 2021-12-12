@@ -22,6 +22,7 @@ use rocket_okapi::okapi::schemars::JsonSchema;
     Serialize,
 )]
 #[serde(crate = "rocket::serde")]
+#[serde(rename_all = "camelCase")]
 #[belongs_to(User, foreign_key = "user_id")]
 #[belongs_to(FlightOffer, foreign_key = "offer_id")]
 #[primary_key(user_id, offer_id)]
