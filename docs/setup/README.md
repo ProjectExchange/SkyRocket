@@ -1,6 +1,6 @@
 # Prerequisites
 
-The complete setup is containerized an needs the following prerequisites to run
+The complete setup is containerized and needs the following prerequisites to run
 
 * Linux Server
 * Installed Docker and Docker Compose (there is also the possibility to use Podman)
