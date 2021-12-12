@@ -76,7 +76,6 @@ export class ProfileComponent implements OnInit {
     this.flightService.readOffer().subscribe((offers) => {
       offers.forEach((offer) => {
         this.offers[offer.id] = offer;
-        console.warn('1');
       })
       this.updateBookingsTable();
     });
@@ -85,7 +84,6 @@ export class ProfileComponent implements OnInit {
   updateBookingsTable() {
     this.flightService.readOfferBookings(this.authService.id).subscribe((bookings) => {
       this.bookings = bookings.map((booking) => {
-        console.warn(this.offers, booking.offerId);
         if (this.offers[booking.offerId]) {
           return {
             departure: this.offers[booking.offerId].departureIcao,
